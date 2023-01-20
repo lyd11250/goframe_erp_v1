@@ -14,14 +14,6 @@ type GetRoleByIdOutput struct {
 	entity.SysRole
 }
 
-type GetUserRoleListInput struct {
-	UserId int64
-}
-
-type GetUserRoleListOutput struct {
-	List []entity.SysRole
-}
-
 type AddRoleInput struct {
 	RoleName string
 }
@@ -47,4 +39,12 @@ type AddRoleAccessInput struct {
 type DeleteRoleAccessInput struct {
 	RoleId   int64
 	AccessId int64
+}
+
+type GetRoleAccessListInput struct {
+	RoleId int64
+}
+
+type GetRoleAccessListOutput struct {
+	List []entity.SysAccess
 }

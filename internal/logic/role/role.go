@@ -2,8 +2,8 @@ package role
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/util/gconv"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
@@ -30,19 +30,6 @@ func (s *sRole) GetRoleById(ctx context.Context, in model.GetRoleByIdInput) (out
 	return
 }
 
-func (s *sRole) GetUserRoleList(ctx context.Context, in model.GetUserRoleListInput) (out model.GetUserRoleListOutput, err error) {
-	result, err := dao.SysUserRole.Ctx(ctx).All(dao.SysUserRole.Columns().UserId, in.UserId)
-	for _, row := range result.List() {
-		roleId := gconv.Int64(row["role_id"])
-		role, err := s.GetRoleById(ctx, model.GetRoleByIdInput{RoleId: roleId})
-		if err != nil {
-			continue
-		}
-		out.List = append(out.List, role.SysRole)
-	}
-	return
-}
-
 func (s *sRole) AddRole(ctx context.Context, in model.AddRoleInput) (out model.AddRoleOutput, err error) {
 	id, err := dao.SysRole.Ctx(ctx).InsertAndGetId(g.Map{
 		dao.SysRole.Columns().RoleName: in.RoleName,
@@ -62,7 +49,26 @@ func (s *sRole) UpdateRole(ctx context.Context, in model.UpdateRoleInput) (err e
 }
 
 func (s *sRole) DeleteRole(ctx context.Context, in model.DeleteRoleInput) (err error) {
-	_, err = dao.SysRole.Ctx(ctx).WherePri(in.RoleId).Delete()
+	err = dao.SysRole.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		// 删除sys_role表中的数据
+		_, e := tx.Model(dao.SysRole.Table()).WherePri(in.RoleId).Delete()
+		if e != nil {
+			return e
+		}
+
+		// 删除sys_role_access表中的相关数据
+		_, e = tx.Model(dao.SysRoleAccess.Table()).Where(dao.SysRoleAccess.Columns().RoleId, in.RoleId).Delete()
+		if e != nil {
+			return e
+		}
+
+		// 删除sys_user_role表中的相关数据
+		_, e = tx.Model(dao.SysUserRole.Table()).Where(dao.SysUserRole.Columns().RoleId, in.RoleId).Delete()
+		if e != nil {
+			return e
+		}
+		return nil
+	})
 	return
 }
 
@@ -79,5 +85,22 @@ func (s *sRole) DeleteRoleAccess(ctx context.Context, in model.DeleteRoleAccessI
 		dao.SysRoleAccess.Columns().AccessId: in.AccessId,
 		dao.SysRoleAccess.Columns().RoleId:   in.RoleId,
 	}).Delete()
+	return
+}
+
+func (s *sRole) GetRoleAccessList(ctx context.Context, in model.GetRoleAccessListInput) (out model.GetRoleAccessListOutput, err error) {
+	array, err := dao.SysRoleAccess.Ctx(ctx).
+		Where(dao.SysRoleAccess.Columns().RoleId, in.RoleId).
+		Array(dao.SysRoleAccess.Columns().AccessId)
+	if err != nil {
+		return model.GetRoleAccessListOutput{}, err
+	}
+	for _, accessId := range array {
+		output, err := service.Access().GetAccessById(ctx, model.GetAccessByIdInput{AccessId: accessId.Int64()})
+		if err != nil {
+			return model.GetRoleAccessListOutput{}, err
+		}
+		out.List = append(out.List, output.SysAccess)
+	}
 	return
 }

@@ -36,7 +36,7 @@ type UserLoginOutput struct {
 	UserInfo
 }
 
-type UpdateUserByIdInput struct {
+type UpdateUserInput struct {
 	UserId       int64
 	UserPassword *string
 	UserRealName *string
@@ -63,6 +63,14 @@ type GetUserAccessListInput struct {
 
 type GetUserAccessListOutput struct {
 	List []entity.SysAccess
+}
+
+type GetUserRoleListInput struct {
+	UserId int64
+}
+
+type GetUserRoleListOutput struct {
+	List []entity.SysRole
 }
 
 type AddUserRoleInput struct {

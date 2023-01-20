@@ -58,13 +58,13 @@ func (c *cUser) UserLogin(ctx context.Context, req *v1.UserLoginReq) (res *v1.Us
 	return
 }
 
-func (c *cUser) UpdateUserById(ctx context.Context, req *v1.UpdateUserReq) (res *v1.UpdateUserRes, err error) {
-	input := model.UpdateUserByIdInput{}
+func (c *cUser) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (res *v1.UpdateUserRes, err error) {
+	input := model.UpdateUserInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err
 	}
-	err = service.User().UpdateUserById(ctx, input)
+	err = service.User().UpdateUser(ctx, input)
 	if err != nil {
 		return nil, err
 	}

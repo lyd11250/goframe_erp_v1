@@ -55,7 +55,7 @@ func (s *sUser) UserLogin(ctx context.Context, in model.UserLoginInput) (out mod
 	return
 }
 
-func (s *sUser) UpdateUserById(ctx context.Context, in model.UpdateUserByIdInput) (err error) {
+func (s *sUser) UpdateUser(ctx context.Context, in model.UpdateUserInput) (err error) {
 	data := g.Map{
 		dao.SysUser.Columns().UserPhone:    in.UserPhone,
 		dao.SysUser.Columns().UserRealName: in.UserRealName,
@@ -98,16 +98,18 @@ func (s *sUser) AddUser(ctx context.Context, in model.AddUserInput) (out model.A
 }
 
 func (s *sUser) GetUserAccessList(ctx context.Context, in model.GetUserAccessListInput) (out model.GetUserAccessListOutput, err error) {
-	roleList, err := service.Role().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: in.UserId})
+	roleList, err := s.GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: in.UserId})
 	if err != nil {
 		return model.GetUserAccessListOutput{}, err
 	}
 	for _, role := range roleList.List {
-		accessList, err := service.Access().GetRoleAccessList(ctx, model.GetRoleAccessListInput{RoleId: role.RoleId})
+		accessList, err := service.Role().GetRoleAccessList(ctx, model.GetRoleAccessListInput{RoleId: role.RoleId})
 		if err != nil {
 			return model.GetUserAccessListOutput{}, err
 		}
-		out.List = accessList.List
+		for _, access := range accessList.List {
+			out.List = append(out.List, access)
+		}
 	}
 	return
 }
@@ -125,6 +127,23 @@ func (s *sUser) DeleteUserRole(ctx context.Context, in model.DeleteUserRoleInput
 		dao.SysUserRole.Columns().UserId: in.UserId,
 		dao.SysUserRole.Columns().RoleId: in.RoleId,
 	}).Delete()
+	return
+}
+
+func (s *sUser) GetUserRoleList(ctx context.Context, in model.GetUserRoleListInput) (out model.GetUserRoleListOutput, err error) {
+	array, err := dao.SysUserRole.Ctx(ctx).
+		Where(dao.SysUserRole.Columns().UserId, in.UserId).
+		Array(dao.SysUserRole.Columns().RoleId)
+	if err != nil {
+		return model.GetUserRoleListOutput{}, err
+	}
+	for _, roleId := range array {
+		output, err := service.Role().GetRoleById(ctx, model.GetRoleByIdInput{RoleId: roleId.Int64()})
+		if err != nil {
+			return model.GetUserRoleListOutput{}, err
+		}
+		out.List = append(out.List, output.SysRole)
+	}
 	return
 }
 

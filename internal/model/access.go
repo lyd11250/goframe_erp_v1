@@ -14,14 +14,6 @@ type GetAccessByIdOutput struct {
 	entity.SysAccess
 }
 
-type GetRoleAccessListInput struct {
-	RoleId int64
-}
-
-type GetRoleAccessListOutput struct {
-	List []entity.SysAccess
-}
-
 type AddAccessInput struct {
 	AccessTitle string // 权限标题
 	AccessUri   string // 权限路径

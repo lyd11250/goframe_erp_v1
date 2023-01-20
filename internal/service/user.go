@@ -15,11 +15,12 @@ type (
 		GetUserById(ctx context.Context, in model.GetUserByIdInput) (out model.GetUserByIdOutput, err error)
 		GetUserByUserName(ctx context.Context, in model.GetUserByUserNameInput) (out model.GetUserByUserNameOutput, err error)
 		UserLogin(ctx context.Context, in model.UserLoginInput) (out model.UserLoginOutput, err error)
-		UpdateUserById(ctx context.Context, in model.UpdateUserByIdInput) (err error)
+		UpdateUser(ctx context.Context, in model.UpdateUserInput) (err error)
 		AddUser(ctx context.Context, in model.AddUserInput) (out model.AddUserOutput, err error)
 		GetUserAccessList(ctx context.Context, in model.GetUserAccessListInput) (out model.GetUserAccessListOutput, err error)
 		AddUserRole(ctx context.Context, in model.AddUserRoleInput) (err error)
 		DeleteUserRole(ctx context.Context, in model.DeleteUserRoleInput) (err error)
+		GetUserRoleList(ctx context.Context, in model.GetUserRoleListInput) (out model.GetUserRoleListOutput, err error)
 	}
 )
 

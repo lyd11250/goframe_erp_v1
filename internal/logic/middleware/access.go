@@ -29,7 +29,7 @@ func (s *sMiddleware) AccessHandler(r *ghttp.Request) {
 	// 权限验证
 	accessList, err := service.User().GetUserAccessList(ctx, model.GetUserAccessListInput{UserId: loginId})
 	if err != nil {
-		response.JsonExit(r, gcode.CodeInternalError.Code(), "权限认证失败")
+		response.JsonExit(r, gcode.CodeInternalError.Code(), "权限认证失败，请联系系统管理员")
 		return
 	}
 	for _, access := range accessList.List {

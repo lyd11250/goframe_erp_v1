@@ -14,12 +14,12 @@ type (
 	IRole interface {
 		GetRoleList(ctx context.Context) (out model.GetRoleListOutput, err error)
 		GetRoleById(ctx context.Context, in model.GetRoleByIdInput) (out model.GetRoleByIdOutput, err error)
-		GetUserRoleList(ctx context.Context, in model.GetUserRoleListInput) (out model.GetUserRoleListOutput, err error)
 		AddRole(ctx context.Context, in model.AddRoleInput) (out model.AddRoleOutput, err error)
 		UpdateRole(ctx context.Context, in model.UpdateRoleInput) (err error)
 		DeleteRole(ctx context.Context, in model.DeleteRoleInput) (err error)
 		AddRoleAccess(ctx context.Context, in model.AddRoleAccessInput) (err error)
 		DeleteRoleAccess(ctx context.Context, in model.DeleteRoleAccessInput) (err error)
+		GetRoleAccessList(ctx context.Context, in model.GetRoleAccessListInput) (out model.GetRoleAccessListOutput, err error)
 	}
 )
 
