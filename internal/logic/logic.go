@@ -6,4 +6,5 @@ package logic
 
 import (
 	_ "goframe-erp-v1/internal/logic/middleware"
+	_ "goframe-erp-v1/internal/logic/user"
 )

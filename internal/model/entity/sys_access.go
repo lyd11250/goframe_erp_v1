@@ -6,7 +6,7 @@ package entity
 
 // SysAccess is the golang structure for table sys_access.
 type SysAccess struct {
-	AccessId    int64  `json:"accessId"    description:"权限ID"` // 权限ID
-	AccessTitle string `json:"accessTitle" description:"权限标题"` // 权限标题
-	AccessUri   string `json:"accessUri"   description:"权限路径"` // 权限路径
+	AccessId    int64  `json:"accessId"    ` // 权限ID
+	AccessTitle string `json:"accessTitle" ` // 权限标题
+	AccessUri   string `json:"accessUri"   ` // 权限路径
 }

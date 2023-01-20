@@ -6,7 +6,7 @@ package entity
 
 // SysUserRole is the golang structure for table sys_user_role.
 type SysUserRole struct {
-	UserRoleId int64 `json:"userRoleId" description:"用户角色关联ID"` // 用户角色关联ID
-	UserId     int64 `json:"userId"     description:"关联用户"`     // 关联用户
-	RoleId     int64 `json:"roleId"     description:"关联角色"`     // 关联角色
+	UserRoleId int64 `json:"userRoleId" ` // 用户角色关联ID
+	UserId     int64 `json:"userId"     ` // 关联用户
+	RoleId     int64 `json:"roleId"     ` // 关联角色
 }

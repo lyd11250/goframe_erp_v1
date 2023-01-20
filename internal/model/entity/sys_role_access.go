@@ -6,7 +6,7 @@ package entity
 
 // SysRoleAccess is the golang structure for table sys_role_access.
 type SysRoleAccess struct {
-	RoleAccessId int64 `json:"roleAccessId" description:"角色权限关联ID"` // 角色权限关联ID
-	RoleId       int64 `json:"roleId"       description:"关联角色ID"`   // 关联角色ID
-	AccessId     int64 `json:"accessId"     description:"关联权限ID"`   // 关联权限ID
+	RoleAccessId int64 `json:"roleAccessId" ` // 角色权限关联ID
+	RoleId       int64 `json:"roleId"       ` // 关联角色ID
+	AccessId     int64 `json:"accessId"     ` // 关联权限ID
 }

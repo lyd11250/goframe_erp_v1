@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
 	"github.com/gogf/gf/v2/os/gctx"
 	"goframe-erp-v1/internal/cmd"
 	_ "goframe-erp-v1/internal/logic"

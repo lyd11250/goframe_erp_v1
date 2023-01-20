@@ -24,7 +24,7 @@ var (
 					service.Middleware().ResponseHandler,
 				)
 				group.Bind(
-					controller.Hello,
+					controller.User,
 				)
 			})
 			s.Run()

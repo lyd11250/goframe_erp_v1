@@ -10,11 +10,11 @@ import (
 
 // SysLog is the golang structure for table sys_log.
 type SysLog struct {
-	LogId    int64       `json:"logId"    description:"日志ID"`   // 日志ID
-	UserId   int64       `json:"userId"   description:"操作者ID"`  // 操作者ID
-	FromIp   string      `json:"fromIp"   description:"操作者IP"`  // 操作者IP
-	Uri      string      `json:"uri"      description:"访问uri"`  // 访问uri
-	LogTime  *gtime.Time `json:"logTime"  description:"访问时间"`   // 访问时间
-	LogType  string      `json:"logType"  description:"日志级别"`   // 日志级别
-	LogError string      `json:"logError" description:"日志错误信息"` // 日志错误信息
+	LogId    int64       `json:"logId"    ` // 日志ID
+	UserId   int64       `json:"userId"   ` // 操作者ID
+	FromIp   string      `json:"fromIp"   ` // 操作者IP
+	Uri      string      `json:"uri"      ` // 访问uri
+	LogTime  *gtime.Time `json:"logTime"  ` // 访问时间
+	LogType  string      `json:"logType"  ` // 日志级别
+	LogError string      `json:"logError" ` // 日志错误信息
 }

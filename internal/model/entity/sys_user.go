@@ -6,11 +6,11 @@ package entity
 
 // SysUser is the golang structure for table sys_user.
 type SysUser struct {
-	UserId       int64  `json:"userId"       description:"用户ID，主键"`     // 用户ID，主键
-	UserName     string `json:"userName"     description:"登录用户名"`       // 登录用户名
-	UserPassword string `json:"userPassword" description:"登录密码，md5加密"`  // 登录密码，md5加密
-	UserRealName string `json:"userRealName" description:"用户真实姓名"`      // 用户真实姓名
-	UserPhone    string `json:"userPhone"    description:"用户手机号，11位数字"` // 用户手机号，11位数字
-	UserImage    string `json:"userImage"    description:"用户头像url"`     // 用户头像url
-	UserStatus   uint   `json:"userStatus"   description:"用户状态"`        // 用户状态
+	UserId       int64  `json:"userId"       ` // 用户ID，主键
+	UserName     string `json:"userName"     ` // 登录用户名
+	UserPassword string `json:"userPassword" ` // 登录密码，md5加密
+	UserRealName string `json:"userRealName" ` // 用户真实姓名
+	UserPhone    string `json:"userPhone"    ` // 用户手机号，11位数字
+	UserImage    string `json:"userImage"    ` // 用户头像url
+	UserStatus   uint   `json:"userStatus"   ` // 用户状态
 }
