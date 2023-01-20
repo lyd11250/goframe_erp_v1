@@ -36,7 +36,7 @@ func (s *sRedis) CheckLogin() int64 {
 		return 0
 	}
 	// 续期
-	request.Cookie.SetCookie(token, idVar.String(), "", "/", consts.CookieEx)
+	request.Cookie.SetCookie("token", token, "", "/", consts.CookieEx)
 	_, _ = g.Redis().Expire(s.ctx, token, consts.RedisEx)
 	return idVar.Int64()
 }

@@ -54,3 +54,21 @@ type AddUserInput struct {
 type AddUserOutput struct {
 	UserId int64
 }
+
+type GetUserAccessListInput struct {
+	UserId int64
+}
+
+type GetUserAccessListOutput struct {
+	List []Access
+}
+
+type AddUserRoleInput struct {
+	UserId int64
+	RoleId int64
+}
+
+type DeleteUserRoleInput struct {
+	UserId int64
+	RoleId int64
+}

@@ -20,16 +20,14 @@ type SysRoleDao struct {
 
 // SysRoleColumns defines and stores column names for table sys_role.
 type SysRoleColumns struct {
-	RoleId     string // 角色ID，主键
-	RoleName   string // 角色名称
-	RoleStatus string // 角色状态
+	RoleId   string // 角色ID，主键
+	RoleName string // 角色名称
 }
 
 // sysRoleColumns holds the columns for table sys_role.
 var sysRoleColumns = SysRoleColumns{
-	RoleId:     "role_id",
-	RoleName:   "role_name",
-	RoleStatus: "role_status",
+	RoleId:   "role_id",
+	RoleName: "role_name",
 }
 
 // NewSysRoleDao creates and returns a new DAO object for table data access.

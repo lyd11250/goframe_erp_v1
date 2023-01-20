@@ -39,8 +39,8 @@ type UserLoginRes struct {
 	UserInfo
 }
 
-type UpdateUserByIdReq struct {
-	g.Meta       `path:"/user/update/id" method:"post" summary:"通过ID修改用户信息"`
+type UpdateUserReq struct {
+	g.Meta       `path:"/user/update" method:"post" summary:"修改用户"`
 	UserId       *int64  `json:"userId" dc:"用户ID" v:"required#请输入用户名"`
 	UserPassword *string `json:"userPassword" dc:"密码"`
 	UserRealName *string `json:"userRealName" dc:"真实姓名"`
@@ -49,7 +49,7 @@ type UpdateUserByIdReq struct {
 	UserStatus   *uint   `json:"userStatus" dc:"用户状态"`
 }
 
-type UpdateUserByIdRes struct {
+type UpdateUserRes struct {
 }
 
 type AddUserReq struct {
@@ -63,4 +63,22 @@ type AddUserReq struct {
 
 type AddUserRes struct {
 	UserId int64 `json:"userId" dc:"用户ID"`
+}
+
+type AddUserRoleReq struct {
+	g.Meta `path:"/user/role/add" method:"post" summary:"用户新增角色"`
+	UserId int64 `json:"userId" dc:"用户ID" v:"required#请输入用户ID"`
+	RoleId int64 `json:"roleId" dc:"角色ID" v:"required#请输入角色ID"`
+}
+
+type AddUserRoleRes struct {
+}
+
+type DeleteUserRoleReq struct {
+	g.Meta `path:"/user/role/delete" method:"post" summary:"用户删除角色"`
+	UserId int64 `json:"userId" dc:"用户ID" v:"required#请输入用户ID"`
+	RoleId int64 `json:"roleId" dc:"角色ID" v:"required#请输入角色ID"`
+}
+
+type DeleteUserRoleRes struct {
 }

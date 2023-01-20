@@ -58,7 +58,7 @@ func (c *cUser) UserLogin(ctx context.Context, req *v1.UserLoginReq) (res *v1.Us
 	return
 }
 
-func (c *cUser) UpdateUserById(ctx context.Context, req *v1.UpdateUserByIdReq) (res *v1.UpdateUserByIdRes, err error) {
+func (c *cUser) UpdateUserById(ctx context.Context, req *v1.UpdateUserReq) (res *v1.UpdateUserRes, err error) {
 	input := model.UpdateUserByIdInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
@@ -68,7 +68,7 @@ func (c *cUser) UpdateUserById(ctx context.Context, req *v1.UpdateUserByIdReq) (
 	if err != nil {
 		return nil, err
 	}
-	res = &v1.UpdateUserByIdRes{}
+	res = &v1.UpdateUserRes{}
 	return
 }
 
@@ -82,6 +82,31 @@ func (c *cUser) AddUser(ctx context.Context, req *v1.AddUserReq) (res *v1.AddUse
 	if err != nil {
 		return nil, err
 	}
+
+	// 用户默认拥有”系统用户“角色
+	err = service.User().AddUserRole(ctx, model.AddUserRoleInput{
+		UserId: output.UserId,
+		RoleId: 1,
+	})
+	if err != nil {
+		return nil, err
+	}
 	res = &v1.AddUserRes{UserId: output.UserId}
+	return
+}
+
+func (c *cUser) AddUserRole(ctx context.Context, req *v1.AddUserRoleReq) (res *v1.AddUserRoleRes, err error) {
+	err = service.User().AddUserRole(ctx, model.AddUserRoleInput{
+		UserId: req.UserId,
+		RoleId: req.RoleId,
+	})
+	return
+}
+
+func (c *cUser) DeleteUserRole(ctx context.Context, req *v1.DeleteUserRoleReq) (res *v1.DeleteUserRoleRes, err error) {
+	err = service.User().DeleteUserRole(ctx, model.DeleteUserRoleInput{
+		UserId: req.UserId,
+		RoleId: req.RoleId,
+	})
 	return
 }

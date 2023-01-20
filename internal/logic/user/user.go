@@ -49,7 +49,7 @@ func (s *sUser) UserLogin(ctx context.Context, in model.UserLoginInput) (out mod
 		dao.SysUser.Columns().UserPassword: encryptPassword(in.UserPassword),
 	}).Scan(&user)
 	if err != nil {
-		return
+		return out, gerror.New("用户名或密码错误")
 	}
 	out.UserInfo = convertDbEntityToOutput(user)
 	return
@@ -94,6 +94,37 @@ func (s *sUser) AddUser(ctx context.Context, in model.AddUserInput) (out model.A
 		return model.AddUserOutput{}, err
 	}
 	out = model.AddUserOutput{UserId: id}
+	return
+}
+
+func (s *sUser) GetUserAccessList(ctx context.Context, in model.GetUserAccessListInput) (out model.GetUserAccessListOutput, err error) {
+	roleList, err := service.Role().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: in.UserId})
+	if err != nil {
+		return model.GetUserAccessListOutput{}, err
+	}
+	for _, role := range roleList.List {
+		accessList, err := service.Access().GetRoleAccessList(ctx, model.GetRoleAccessListInput{RoleId: role.RoleId})
+		if err != nil {
+			return model.GetUserAccessListOutput{}, err
+		}
+		out.List = accessList.List
+	}
+	return
+}
+
+func (s *sUser) AddUserRole(ctx context.Context, in model.AddUserRoleInput) (err error) {
+	_, err = dao.SysUserRole.Ctx(ctx).Insert(g.Map{
+		dao.SysUserRole.Columns().UserId: in.UserId,
+		dao.SysUserRole.Columns().RoleId: in.RoleId,
+	})
+	return
+}
+
+func (s *sUser) DeleteUserRole(ctx context.Context, in model.DeleteUserRoleInput) (err error) {
+	_, err = dao.SysUserRole.Ctx(ctx).Where(g.Map{
+		dao.SysUserRole.Columns().UserId: in.UserId,
+		dao.SysUserRole.Columns().RoleId: in.RoleId,
+	}).Delete()
 	return
 }
 

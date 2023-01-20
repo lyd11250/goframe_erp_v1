@@ -11,6 +11,7 @@ import (
 
 type (
 	IMiddleware interface {
+		AccessHandler(r *ghttp.Request)
 		ResponseHandler(r *ghttp.Request)
 	}
 )

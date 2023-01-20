@@ -17,6 +17,9 @@ type (
 		UserLogin(ctx context.Context, in model.UserLoginInput) (out model.UserLoginOutput, err error)
 		UpdateUserById(ctx context.Context, in model.UpdateUserByIdInput) (err error)
 		AddUser(ctx context.Context, in model.AddUserInput) (out model.AddUserOutput, err error)
+		GetUserAccessList(ctx context.Context, in model.GetUserAccessListInput) (out model.GetUserAccessListOutput, err error)
+		AddUserRole(ctx context.Context, in model.AddUserRoleInput) (err error)
+		DeleteUserRole(ctx context.Context, in model.DeleteUserRoleInput) (err error)
 	}
 )
 

@@ -22,9 +22,13 @@ var (
 				group.Middleware(
 					// 响应处理中间件
 					service.Middleware().ResponseHandler,
+					// 权限认证中间件
+					service.Middleware().AccessHandler,
 				)
 				group.Bind(
 					controller.User,
+					controller.Access,
+					controller.Role,
 				)
 			})
 			s.Run()
