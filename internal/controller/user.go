@@ -6,6 +6,7 @@ import (
 	v1 "goframe-erp-v1/api/v1"
 	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
+	"goframe-erp-v1/utility/redis"
 )
 
 type cUser struct {
@@ -53,6 +54,7 @@ func (c *cUser) UserLogin(ctx context.Context, req *v1.UserLoginReq) (res *v1.Us
 	if err != nil {
 		return nil, err
 	}
+	redis.Ctx(ctx).Login(res.UserId)
 	return
 }
 
