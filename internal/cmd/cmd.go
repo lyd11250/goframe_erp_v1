@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"goframe-erp-v1/internal/service"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -18,7 +19,10 @@ var (
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
 			s.Group("/", func(group *ghttp.RouterGroup) {
-				group.Middleware(ghttp.MiddlewareHandlerResponse)
+				group.Middleware(
+					// 响应处理中间件
+					service.Middleware().ResponseHandler,
+				)
 				group.Bind(
 					controller.Hello,
 				)
