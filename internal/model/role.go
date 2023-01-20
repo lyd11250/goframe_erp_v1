@@ -1,8 +1,9 @@
 package model
 
-type Role struct {
-	RoleId   int64  // 角色ID，主键
-	RoleName string // 角色名称
+import "goframe-erp-v1/internal/model/entity"
+
+type GetRoleListOutput struct {
+	List []entity.SysRole
 }
 
 type GetRoleByIdInput struct {
@@ -10,7 +11,7 @@ type GetRoleByIdInput struct {
 }
 
 type GetRoleByIdOutput struct {
-	Role
+	entity.SysRole
 }
 
 type GetUserRoleListInput struct {
@@ -18,7 +19,7 @@ type GetUserRoleListInput struct {
 }
 
 type GetUserRoleListOutput struct {
-	List []Role
+	List []entity.SysRole
 }
 
 type AddRoleInput struct {

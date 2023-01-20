@@ -1,11 +1,16 @@
 package v1
 
-import "github.com/gogf/gf/v2/frame/g"
+import (
+	"github.com/gogf/gf/v2/frame/g"
+	"goframe-erp-v1/internal/model/entity"
+)
 
-type Access struct {
-	AccessId    int64  `json:"accessId"    ` // 权限ID
-	AccessTitle string `json:"accessTitle" ` // 权限标题
-	AccessUri   string `json:"accessUri"   ` // 权限路径
+type GetAccessListReq struct {
+	g.Meta `path:"/access/list" method:"post" summary:"获取权限列表"`
+}
+
+type GetAccessListRes struct {
+	List []entity.SysAccess `json:"list"`
 }
 
 type AddAccessReq struct {

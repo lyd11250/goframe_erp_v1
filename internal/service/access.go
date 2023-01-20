@@ -12,6 +12,7 @@ import (
 
 type (
 	IAccess interface {
+		GetAccessList(ctx context.Context) (out model.GetAccessListOutput, err error)
 		GetAccessById(ctx context.Context, in model.GetAccessByIdInput) (out model.GetAccessByIdOutput, err error)
 		GetRoleAccessList(ctx context.Context, in model.GetRoleAccessListInput) (out model.GetRoleAccessListOutput, err error)
 		AddAccess(ctx context.Context, in model.AddAccessInput) (out model.AddAccessOutput, err error)

@@ -20,6 +20,11 @@ func init() {
 	service.RegisterAccess(New())
 }
 
+func (s *sAccess) GetAccessList(ctx context.Context) (out model.GetAccessListOutput, err error) {
+	err = dao.SysAccess.Ctx(ctx).Scan(&out.List)
+	return
+}
+
 func (s *sAccess) GetAccessById(ctx context.Context, in model.GetAccessByIdInput) (out model.GetAccessByIdOutput, err error) {
 	err = dao.SysAccess.Ctx(ctx).WherePri(in.AccessId).Scan(&out)
 	return
@@ -36,7 +41,7 @@ func (s *sAccess) GetRoleAccessList(ctx context.Context, in model.GetRoleAccessL
 		if err != nil {
 			return model.GetRoleAccessListOutput{}, err
 		}
-		out.List = append(out.List, access.Access)
+		out.List = append(out.List, access.SysAccess)
 	}
 	return
 }

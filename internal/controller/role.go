@@ -49,3 +49,12 @@ func (c *cRole) DeleteRoleAccess(ctx context.Context, req *v1.DeleteRoleAccessRe
 	})
 	return
 }
+
+func (c *cRole) GetRoleList(ctx context.Context, req *v1.GetRoleListReq) (res *v1.GetRoleListRes, err error) {
+	output, err := service.Role().GetRoleList(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res = &v1.GetRoleListRes{List: output.List}
+	return
+}

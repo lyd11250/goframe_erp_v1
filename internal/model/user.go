@@ -1,5 +1,7 @@
 package model
 
+import "goframe-erp-v1/internal/model/entity"
+
 type UserInfo struct {
 	UserId       int64
 	UserName     string
@@ -60,7 +62,7 @@ type GetUserAccessListInput struct {
 }
 
 type GetUserAccessListOutput struct {
-	List []Access
+	List []entity.SysAccess
 }
 
 type AddUserRoleInput struct {

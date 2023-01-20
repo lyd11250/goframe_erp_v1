@@ -1,6 +1,17 @@
 package v1
 
-import "github.com/gogf/gf/v2/frame/g"
+import (
+	"github.com/gogf/gf/v2/frame/g"
+	"goframe-erp-v1/internal/model/entity"
+)
+
+type GetRoleListReq struct {
+	g.Meta `path:"/role/list" method:"post" summary:"获取角色列表"`
+}
+
+type GetRoleListRes struct {
+	List []entity.SysRole `json:"list"`
+}
 
 type AddRoleReq struct {
 	g.Meta   `path:"/role/add" method:"post" summary:"新增角色"`

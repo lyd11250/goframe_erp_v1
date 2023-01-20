@@ -1,9 +1,9 @@
 package model
 
-type Access struct {
-	AccessId    int64  // 权限ID
-	AccessTitle string // 权限标题
-	AccessUri   string // 权限路径
+import "goframe-erp-v1/internal/model/entity"
+
+type GetAccessListOutput struct {
+	List []entity.SysAccess
 }
 
 type GetAccessByIdInput struct {
@@ -11,7 +11,7 @@ type GetAccessByIdInput struct {
 }
 
 type GetAccessByIdOutput struct {
-	Access
+	entity.SysAccess
 }
 
 type GetRoleAccessListInput struct {
@@ -19,7 +19,7 @@ type GetRoleAccessListInput struct {
 }
 
 type GetRoleAccessListOutput struct {
-	List []Access
+	List []entity.SysAccess
 }
 
 type AddAccessInput struct {

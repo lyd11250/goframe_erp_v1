@@ -20,6 +20,11 @@ func init() {
 	service.RegisterRole(New())
 }
 
+func (s *sRole) GetRoleList(ctx context.Context) (out model.GetRoleListOutput, err error) {
+	err = dao.SysRole.Ctx(ctx).Scan(&out.List)
+	return
+}
+
 func (s *sRole) GetRoleById(ctx context.Context, in model.GetRoleByIdInput) (out model.GetRoleByIdOutput, err error) {
 	err = dao.SysRole.Ctx(ctx).WherePri(in.RoleId).Scan(&out)
 	return
@@ -33,7 +38,7 @@ func (s *sRole) GetUserRoleList(ctx context.Context, in model.GetUserRoleListInp
 		if err != nil {
 			continue
 		}
-		out.List = append(out.List, role.Role)
+		out.List = append(out.List, role.SysRole)
 	}
 	return
 }

@@ -13,6 +13,15 @@ type cAccess struct {
 
 var Access cAccess
 
+func (c *cAccess) GetAccessList(ctx context.Context, req *v1.GetAccessListReq) (res *v1.GetAccessListRes, err error) {
+	output, err := service.Access().GetAccessList(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res = &v1.GetAccessListRes{List: output.List}
+	return
+}
+
 func (c *cAccess) AddAccess(ctx context.Context, req *v1.AddAccessReq) (res *v1.AddAccessRes, err error) {
 	output, err := service.Access().AddAccess(ctx, model.AddAccessInput{
 		AccessTitle: req.AccessTitle,
