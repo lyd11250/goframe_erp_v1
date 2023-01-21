@@ -20,6 +20,8 @@ var (
 			s := g.Server()
 			s.Group("/", func(group *ghttp.RouterGroup) {
 				group.Middleware(
+					// 跨域处理中间件
+					service.Middleware().CorsHandler,
 					// 响应处理中间件
 					service.Middleware().ResponseHandler,
 					// 权限认证中间件
