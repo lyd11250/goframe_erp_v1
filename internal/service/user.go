@@ -14,6 +14,7 @@ type (
 	IUser interface {
 		GetUserById(ctx context.Context, in model.GetUserByIdInput) (out model.GetUserByIdOutput, err error)
 		GetUserByUserName(ctx context.Context, in model.GetUserByUserNameInput) (out model.GetUserByUserNameOutput, err error)
+		GetUserList(ctx context.Context) (out model.GetUserListOutput, err error)
 		UserLogin(ctx context.Context, in model.UserLoginInput) (out model.UserLoginOutput, err error)
 		UpdateUser(ctx context.Context, in model.UpdateUserInput) (err error)
 		AddUser(ctx context.Context, in model.AddUserInput) (out model.AddUserOutput, err error)

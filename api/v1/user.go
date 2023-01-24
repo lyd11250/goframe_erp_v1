@@ -1,14 +1,18 @@
 package v1
 
-import "github.com/gogf/gf/v2/frame/g"
+import (
+	"github.com/gogf/gf/v2/frame/g"
+	"goframe-erp-v1/internal/model/entity"
+)
 
 type UserInfo struct {
-	UserId       int64  `json:"userId"       ` // 用户ID，主键
-	UserName     string `json:"userName"     ` // 登录用户名
-	UserRealName string `json:"userRealName" ` // 用户真实姓名
-	UserPhone    string `json:"userPhone"    ` // 用户手机号，11位数字
-	UserImage    string `json:"userImage"    ` // 用户头像url
-	UserStatus   uint   `json:"userStatus"   ` // 用户状态
+	UserId       int64            `json:"userId"       ` // 用户ID，主键
+	UserName     string           `json:"userName"     ` // 登录用户名
+	UserRealName string           `json:"userRealName" ` // 用户真实姓名
+	UserPhone    string           `json:"userPhone"    ` // 用户手机号，11位数字
+	UserImage    string           `json:"userImage"    ` // 用户头像url
+	UserStatus   uint             `json:"userStatus"   ` // 用户状态
+	UserRoles    []entity.SysRole `json:"userRoles"`
 }
 
 type GetUserByIdReq struct {
@@ -81,4 +85,12 @@ type DeleteUserRoleReq struct {
 }
 
 type DeleteUserRoleRes struct {
+}
+
+type GetUserListReq struct {
+	g.Meta `path:"/user/list" method:"post" summary:"获取所有用户"`
+}
+
+type GetUserListRes struct {
+	List []UserInfo `json:"list"`
 }

@@ -25,6 +25,11 @@ func (c *cUser) GetUserById(ctx context.Context, req *v1.GetUserByIdReq) (res *v
 	if err != nil {
 		return nil, err
 	}
+	roleList, err := service.User().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: user.UserId})
+	if err != nil {
+		return nil, err
+	}
+	res.UserRoles = roleList.List
 	return
 }
 
@@ -39,6 +44,11 @@ func (c *cUser) GetUserByUserName(ctx context.Context, req *v1.GetUserByUserName
 	if err != nil {
 		return nil, err
 	}
+	roleList, err := service.User().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: user.UserId})
+	if err != nil {
+		return nil, err
+	}
+	res.UserRoles = roleList.List
 	return
 }
 
@@ -55,6 +65,11 @@ func (c *cUser) UserLogin(ctx context.Context, req *v1.UserLoginReq) (res *v1.Us
 		return nil, err
 	}
 	redis.Ctx(ctx).Login(res.UserId)
+	roleList, err := service.User().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: user.UserId})
+	if err != nil {
+		return nil, err
+	}
+	res.UserRoles = roleList.List
 	return
 }
 
@@ -108,5 +123,24 @@ func (c *cUser) DeleteUserRole(ctx context.Context, req *v1.DeleteUserRoleReq) (
 		UserId: req.UserId,
 		RoleId: req.RoleId,
 	})
+	return
+}
+
+func (c *cUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (res *v1.GetUserListRes, err error) {
+	out, err := service.User().GetUserList(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = gconv.Struct(out, &res)
+	if err != nil {
+		return nil, err
+	}
+	for i, user := range res.List {
+		roleList, err := service.User().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: user.UserId})
+		if err != nil {
+			return nil, err
+		}
+		res.List[i].UserRoles = roleList.List
+	}
 	return
 }

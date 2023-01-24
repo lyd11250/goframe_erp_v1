@@ -42,6 +42,11 @@ func (s *sUser) GetUserByUserName(ctx context.Context, in model.GetUserByUserNam
 	return
 }
 
+func (s *sUser) GetUserList(ctx context.Context) (out model.GetUserListOutput, err error) {
+	err = dao.SysUser.Ctx(ctx).Scan(&out.List)
+	return
+}
+
 func (s *sUser) UserLogin(ctx context.Context, in model.UserLoginInput) (out model.UserLoginOutput, err error) {
 	user := entity.SysUser{}
 	err = dao.SysUser.Ctx(ctx).Where(g.Map{

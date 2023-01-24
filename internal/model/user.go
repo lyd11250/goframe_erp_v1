@@ -82,3 +82,7 @@ type DeleteUserRoleInput struct {
 	UserId int64
 	RoleId int64
 }
+
+type GetUserListOutput struct {
+	List []UserInfo
+}
