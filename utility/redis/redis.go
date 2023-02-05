@@ -25,6 +25,13 @@ func (s *sRedis) Login(userId int64) {
 	_ = g.Redis().SetEX(s.ctx, token, userId, consts.RedisEx)
 }
 
+func (s *sRedis) Logout() {
+	request := g.RequestFromCtx(s.ctx)
+	token := request.Cookie.Get("token").String()
+	request.Cookie.Remove("token")
+	_, _ = g.Redis().Del(s.ctx, token)
+}
+
 func (s *sRedis) CheckLogin() int64 {
 	request := g.RequestFromCtx(s.ctx)
 	if !request.Cookie.Contains("token") {
