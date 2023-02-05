@@ -31,8 +31,14 @@ var (
 					controller.User,
 					controller.Access,
 					controller.Role,
+					controller.File,
 				)
 			})
+			path, err := g.Cfg().Get(ctx, "app.path")
+			if err != nil {
+				return err
+			}
+			s.AddStaticPath("/file", path.String())
 			s.Run()
 			return nil
 		},
