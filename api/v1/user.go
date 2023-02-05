@@ -52,10 +52,11 @@ type UserLogoutRes struct {
 
 type UpdateUserReq struct {
 	g.Meta       `path:"/user/update" method:"post" summary:"修改用户"`
-	UserId       *int64  `json:"userId" dc:"用户ID" v:"required#请输入用户名"`
+	UserId       *int64  `json:"userId" dc:"用户ID" v:"required#请输入用户ID"`
+	UserName     *string `json:"userName" dc:"用户名" v:"passport#用户名不合法"`
 	UserPassword *string `json:"userPassword" dc:"密码"`
 	UserRealName *string `json:"userRealName" dc:"真实姓名"`
-	UserPhone    *string `json:"userPhone" dc:"手机号"`
+	UserPhone    *string `json:"userPhone" dc:"手机号" v:"phone#请输入正确的手机号"`
 	UserImage    *string `json:"userImage" dc:"头像url"`
 	UserStatus   *uint   `json:"userStatus" dc:"用户状态"`
 }
@@ -65,11 +66,11 @@ type UpdateUserRes struct {
 
 type AddUserReq struct {
 	g.Meta       `path:"/user/add" method:"post" summary:"新增用户"`
-	UserName     string `json:"userName" dc:"用户名" v:"required#请输入用户名"`
-	UserPassword string `json:"userPassword" dc:"密码" v:"required#请输入密码"`
+	UserName     string `json:"userName" dc:"用户名" v:"required#请输入用户名|passport#用户名不合法"`
 	UserRealName string `json:"userRealName" dc:"真实姓名" v:"required#请输入真实姓名"`
-	UserPhone    string `json:"userPhone" dc:"手机号码" v:"required#请输入手机号码"`
+	UserPhone    string `json:"userPhone" dc:"手机号码" v:"required#请输入手机号码|phone#请输入正确的手机号"`
 	UserImage    string `json:"userImage" dc:"头像url" `
+	UserStatus   string `json:"userStatus" dc:"用户账号状态" `
 }
 
 type AddUserRes struct {

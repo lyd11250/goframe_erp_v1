@@ -63,6 +63,7 @@ func (s *sUser) UserLogin(ctx context.Context, in model.UserLoginInput) (out mod
 func (s *sUser) UpdateUser(ctx context.Context, in model.UpdateUserInput) (err error) {
 	data := g.Map{
 		dao.SysUser.Columns().UserPhone:    in.UserPhone,
+		dao.SysUser.Columns().UserName:     in.UserName,
 		dao.SysUser.Columns().UserRealName: in.UserRealName,
 		dao.SysUser.Columns().UserImage:    in.UserImage,
 		dao.SysUser.Columns().UserStatus:   in.UserStatus,
@@ -87,10 +88,11 @@ func (s *sUser) AddUser(ctx context.Context, in model.AddUserInput) (out model.A
 	// 输入对象转换为DB对象
 	user := g.Map{
 		dao.SysUser.Columns().UserName:     in.UserName,
-		dao.SysUser.Columns().UserPassword: encryptPassword(in.UserPassword),
+		dao.SysUser.Columns().UserPassword: encryptPassword("123456"),
 		dao.SysUser.Columns().UserRealName: in.UserRealName,
 		dao.SysUser.Columns().UserPhone:    in.UserPhone,
 		dao.SysUser.Columns().UserImage:    in.UserImage,
+		dao.SysUser.Columns().UserStatus:   in.UserStatus,
 	}
 
 	// 插入并返回自动生成的ID

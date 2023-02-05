@@ -38,6 +38,7 @@ type UserLoginOutput struct {
 
 type UpdateUserInput struct {
 	UserId       int64
+	UserName     *string
 	UserPassword *string
 	UserRealName *string
 	UserPhone    *string
@@ -47,10 +48,10 @@ type UpdateUserInput struct {
 
 type AddUserInput struct {
 	UserName     string
-	UserPassword string
 	UserRealName string
 	UserPhone    string
 	UserImage    string
+	UserStatus   int8
 }
 
 type AddUserOutput struct {
