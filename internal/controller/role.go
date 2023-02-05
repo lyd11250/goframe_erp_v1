@@ -58,3 +58,12 @@ func (c *cRole) GetRoleList(ctx context.Context, req *v1.GetRoleListReq) (res *v
 	res = &v1.GetRoleListRes{List: output.List}
 	return
 }
+
+func (c *cRole) GetRoleAccessList(ctx context.Context, req *v1.GetRoleAccessReq) (res *v1.GetRoleAccessRes, err error) {
+	output, err := service.Role().GetRoleAccessList(ctx, model.GetRoleAccessListInput{RoleId: req.RoleId})
+	if err != nil {
+		return nil, err
+	}
+	res = &v1.GetRoleAccessRes{List: output.List}
+	return
+}

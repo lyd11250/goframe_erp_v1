@@ -15,8 +15,12 @@ type cUser struct {
 var User cUser
 
 func (c *cUser) GetUserById(ctx context.Context, req *v1.GetUserByIdReq) (res *v1.GetUserByIdRes, err error) {
+	if req.UserId == nil {
+		id := redis.Ctx(ctx).CheckLogin()
+		req.UserId = &id
+	}
 	user, err := service.User().GetUserById(ctx, model.GetUserByIdInput{
-		UserId: req.UserId,
+		UserId: *req.UserId,
 	})
 	if err != nil {
 		return nil, err
@@ -70,6 +74,11 @@ func (c *cUser) UserLogin(ctx context.Context, req *v1.UserLoginReq) (res *v1.Us
 		return nil, err
 	}
 	res.UserRoles = roleList.List
+	return
+}
+
+func (c *cUser) UserLogout(ctx context.Context, req *v1.UserLogoutReq) (res *v1.UserLogoutRes, err error) {
+	redis.Ctx(ctx).Logout()
 	return
 }
 

@@ -17,7 +17,7 @@ type UserInfo struct {
 
 type GetUserByIdReq struct {
 	g.Meta `path:"/user/id" method:"post" summary:"通过ID获取用户信息"`
-	UserId int64 `json:"userId" dc:"用户ID" v:"required#请输入用户ID"`
+	UserId *int64 `json:"userId" dc:"用户ID"`
 }
 
 type GetUserByIdRes struct {
@@ -41,6 +41,13 @@ type UserLoginReq struct {
 
 type UserLoginRes struct {
 	UserInfo
+}
+
+type UserLogoutReq struct {
+	g.Meta `path:"/user/logout" method:"post" summary:"用户登出"`
+}
+
+type UserLogoutRes struct {
 }
 
 type UpdateUserReq struct {

@@ -56,3 +56,12 @@ type DeleteRoleAccessReq struct {
 
 type DeleteRoleAccessRes struct {
 }
+
+type GetRoleAccessReq struct {
+	g.Meta `path:"/role/access/list" method:"post" summary:"获取角色所拥有的权限列表"`
+	RoleId int64 `json:"roleId" dc:"角色ID" v:"required#请输入角色ID"`
+}
+
+type GetRoleAccessRes struct {
+	List []entity.SysAccess `json:"list"`
+}
