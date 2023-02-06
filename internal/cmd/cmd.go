@@ -32,6 +32,7 @@ var (
 					controller.Access,
 					controller.Role,
 					controller.Supplier,
+					controller.Customer,
 					controller.File,
 				)
 			})
