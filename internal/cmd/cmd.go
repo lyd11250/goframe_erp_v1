@@ -33,6 +33,7 @@ var (
 					controller.Role,
 					controller.Supplier,
 					controller.Customer,
+					controller.Goods,
 					controller.File,
 				)
 			})
