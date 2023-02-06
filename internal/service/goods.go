@@ -13,7 +13,7 @@ import (
 type (
 	IGoods interface {
 		GetGoodsById(ctx context.Context, in model.GetGoodsByIdInput) (out model.GetGoodsByIdOutput, err error)
-		GetGoodsList(ctx context.Context) (out model.GetGoodsListOutput, err error)
+		GetGoodsList(ctx context.Context, in model.GetGoodsListInput) (out model.GetGoodsListOutput, err error)
 		AddGoods(ctx context.Context, in model.AddGoodsInput) (out model.AddGoodsOutput, err error)
 		UpdateGoods(ctx context.Context, in model.UpdateGoodsInput) (err error)
 	}

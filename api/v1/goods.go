@@ -15,7 +15,8 @@ type GetGoodsByIdRes struct {
 }
 
 type GetGoodsListReq struct {
-	g.Meta `path:"/goods/list" method:"post" summary:"获取所有商品"`
+	g.Meta    `path:"/goods/list" method:"post" summary:"获取所有商品"`
+	GoodsName *string `json:"goodsName" dc:"商品名称" v:"required#请输入搜索条件"`
 }
 
 type GetGoodsListRes struct {

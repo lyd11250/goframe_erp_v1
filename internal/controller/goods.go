@@ -23,7 +23,9 @@ func (c *cGoods) GetGoodsById(ctx context.Context, req *v1.GetGoodsByIdReq) (res
 }
 
 func (c *cGoods) GetGoodsList(ctx context.Context, req *v1.GetGoodsListReq) (res *v1.GetGoodsListRes, err error) {
-	output, err := service.Goods().GetGoodsList(ctx)
+	output, err := service.Goods().GetGoodsList(ctx, model.GetGoodsListInput{
+		GoodsName: req.GoodsName,
+	})
 	if err != nil {
 		return nil, err
 	}

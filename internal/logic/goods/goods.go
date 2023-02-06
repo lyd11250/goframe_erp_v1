@@ -23,8 +23,8 @@ func (s *sGoods) GetGoodsById(ctx context.Context, in model.GetGoodsByIdInput) (
 	return
 }
 
-func (s *sGoods) GetGoodsList(ctx context.Context) (out model.GetGoodsListOutput, err error) {
-	err = dao.Goods.Ctx(ctx).Scan(&out.List)
+func (s *sGoods) GetGoodsList(ctx context.Context, in model.GetGoodsListInput) (out model.GetGoodsListOutput, err error) {
+	err = dao.Goods.Ctx(ctx).WhereLike(dao.Goods.Columns().GoodsName, "%"+*in.GoodsName+"%").Scan(&out.List)
 	return
 }
 

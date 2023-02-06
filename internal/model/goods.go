@@ -10,6 +10,10 @@ type GetGoodsByIdOutput struct {
 	entity.Goods
 }
 
+type GetGoodsListInput struct {
+	GoodsName *string
+}
+
 type GetGoodsListOutput struct {
 	List []entity.Goods
 }
