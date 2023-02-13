@@ -37,3 +37,7 @@ type UpdateGoodsInput struct {
 	GoodsImg    *string // 商品主图
 	GoodsStatus *int    // 商品状态
 }
+
+type GetGoodsUnitsOutput struct {
+	List []string
+}

@@ -16,6 +16,7 @@ type (
 		GetGoodsList(ctx context.Context, in model.GetGoodsListInput) (out model.GetGoodsListOutput, err error)
 		AddGoods(ctx context.Context, in model.AddGoodsInput) (out model.AddGoodsOutput, err error)
 		UpdateGoods(ctx context.Context, in model.UpdateGoodsInput) (err error)
+		GetGoodsUnits(ctx context.Context) (out model.GetGoodsUnitsOutput, err error)
 	}
 )
 

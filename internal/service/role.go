@@ -12,8 +12,8 @@ import (
 
 type (
 	IRole interface {
-		GetRoleList(ctx context.Context) (out model.GetRoleListOutput, err error)
-		GetRoleById(ctx context.Context, in model.GetRoleByIdInput) (out model.GetRoleByIdOutput, err error)
+		GetRoleList() (out model.GetRoleListOutput, err error)
+		GetRoleById(in model.GetRoleByIdInput) (out model.GetRoleByIdOutput, err error)
 		AddRole(ctx context.Context, in model.AddRoleInput) (out model.AddRoleOutput, err error)
 		UpdateRole(ctx context.Context, in model.UpdateRoleInput) (err error)
 		DeleteRole(ctx context.Context, in model.DeleteRoleInput) (err error)

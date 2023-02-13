@@ -56,3 +56,12 @@ func (c *cGoods) UpdateGoods(ctx context.Context, req *v1.UpdateGoodsReq) (res *
 	err = service.Goods().UpdateGoods(ctx, input)
 	return
 }
+
+func (c *cGoods) GetGoodsUnits(ctx context.Context, req *v1.GetGoodsUnitsReq) (res *v1.GetGoodsUnitsRes, err error) {
+	output, err := service.Goods().GetGoodsUnits(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res = &v1.GetGoodsUnitsRes{List: output.List}
+	return
+}

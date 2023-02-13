@@ -3,31 +3,46 @@ package role
 import (
 	"context"
 	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/entity"
 	"goframe-erp-v1/internal/service"
 )
 
 type sRole struct {
+	RoleList []entity.SysRole
 }
 
 func New() *sRole {
-	return &sRole{}
+	roleService := &sRole{}
+	err := dao.SysRole.Ctx(gctx.New()).Scan(&roleService.RoleList)
+	if err != nil {
+		return nil
+	}
+	return roleService
 }
 
 func init() {
 	service.RegisterRole(New())
 }
 
-func (s *sRole) GetRoleList(ctx context.Context) (out model.GetRoleListOutput, err error) {
-	err = dao.SysRole.Ctx(ctx).Scan(&out.List)
+func (s *sRole) GetRoleList() (out model.GetRoleListOutput, err error) {
+	out.List = s.RoleList
 	return
 }
 
-func (s *sRole) GetRoleById(ctx context.Context, in model.GetRoleByIdInput) (out model.GetRoleByIdOutput, err error) {
-	err = dao.SysRole.Ctx(ctx).WherePri(in.RoleId).Scan(&out)
-	return
+func (s *sRole) GetRoleById(in model.GetRoleByIdInput) (out model.GetRoleByIdOutput, err error) {
+	for _, role := range s.RoleList {
+		if role.RoleId == in.RoleId {
+			out.SysRole = role
+			return
+		}
+	}
+	return model.GetRoleByIdOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "角色不存在")
 }
 
 func (s *sRole) AddRole(ctx context.Context, in model.AddRoleInput) (out model.AddRoleOutput, err error) {
@@ -89,14 +104,14 @@ func (s *sRole) DeleteRoleAccess(ctx context.Context, in model.DeleteRoleAccessI
 }
 
 func (s *sRole) GetRoleAccessList(ctx context.Context, in model.GetRoleAccessListInput) (out model.GetRoleAccessListOutput, err error) {
-	array, err := dao.SysRoleAccess.Ctx(ctx).
-		Where(dao.SysRoleAccess.Columns().RoleId, in.RoleId).
-		Array(dao.SysRoleAccess.Columns().AccessId)
+	result, err := dao.SysRoleAccess.Ctx(ctx).
+		Fields(dao.SysRoleAccess.Columns().AccessId).
+		All(dao.SysRoleAccess.Columns().RoleId, in.RoleId)
 	if err != nil {
 		return model.GetRoleAccessListOutput{}, err
 	}
-	for _, accessId := range array {
-		output, err := service.Access().GetAccessById(ctx, model.GetAccessByIdInput{AccessId: accessId.Int64()})
+	for _, accessId := range result.Array() {
+		output, err := service.Access().GetAccessById(model.GetAccessByIdInput{AccessId: accessId.Int64()})
 		if err != nil {
 			return model.GetRoleAccessListOutput{}, err
 		}

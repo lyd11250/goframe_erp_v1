@@ -14,7 +14,7 @@ type cAccess struct {
 var Access cAccess
 
 func (c *cAccess) GetAccessList(ctx context.Context, req *v1.GetAccessListReq) (res *v1.GetAccessListRes, err error) {
-	output, err := service.Access().GetAccessList(ctx)
+	output, err := service.Access().GetAccessList()
 	if err != nil {
 		return nil, err
 	}

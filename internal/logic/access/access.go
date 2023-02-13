@@ -3,31 +3,46 @@ package access
 import (
 	"context"
 	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/entity"
 	"goframe-erp-v1/internal/service"
 )
 
 type sAccess struct {
+	AccessList []entity.SysAccess
 }
 
 func New() *sAccess {
-	return &sAccess{}
+	accessService := &sAccess{}
+	err := dao.SysAccess.Ctx(gctx.New()).Scan(&accessService.AccessList)
+	if err != nil {
+		return nil
+	}
+	return accessService
 }
 
 func init() {
 	service.RegisterAccess(New())
 }
 
-func (s *sAccess) GetAccessList(ctx context.Context) (out model.GetAccessListOutput, err error) {
-	err = dao.SysAccess.Ctx(ctx).Scan(&out.List)
+func (s *sAccess) GetAccessList() (out model.GetAccessListOutput, err error) {
+	out.List = s.AccessList
 	return
 }
 
-func (s *sAccess) GetAccessById(ctx context.Context, in model.GetAccessByIdInput) (out model.GetAccessByIdOutput, err error) {
-	err = dao.SysAccess.Ctx(ctx).WherePri(in.AccessId).Scan(&out)
-	return
+func (s *sAccess) GetAccessById(in model.GetAccessByIdInput) (out model.GetAccessByIdOutput, err error) {
+	for _, access := range s.AccessList {
+		if access.AccessId == in.AccessId {
+			out.SysAccess = access
+			return
+		}
+	}
+	return model.GetAccessByIdOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "权限不存在")
 }
 
 func (s *sAccess) AddAccess(ctx context.Context, in model.AddAccessInput) (out model.AddAccessOutput, err error) {

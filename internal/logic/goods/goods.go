@@ -41,3 +41,15 @@ func (s *sGoods) UpdateGoods(ctx context.Context, in model.UpdateGoodsInput) (er
 	_, err = dao.Goods.Ctx(ctx).OmitNil().Data(in).WherePri(in.GoodsId).Update()
 	return
 }
+
+func (s *sGoods) GetGoodsUnits(ctx context.Context) (out model.GetGoodsUnitsOutput, err error) {
+	column := dao.Goods.Columns().GoodsUnit
+	result, err := dao.Goods.Ctx(ctx).Fields(column).Group(column).All()
+	if err != nil {
+		return model.GetGoodsUnitsOutput{}, err
+	}
+	for _, v := range result.Array() {
+		out.List = append(out.List, v.String())
+	}
+	return
+}

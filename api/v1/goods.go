@@ -47,3 +47,11 @@ type UpdateGoodsReq struct {
 
 type UpdateGoodsRes struct {
 }
+
+type GetGoodsUnitsReq struct {
+	g.Meta `path:"/goods/units" method:"post" summary:"获取所有商品单位"`
+}
+
+type GetGoodsUnitsRes struct {
+	List []string `json:"list"`
+}

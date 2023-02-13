@@ -138,14 +138,14 @@ func (s *sUser) DeleteUserRole(ctx context.Context, in model.DeleteUserRoleInput
 }
 
 func (s *sUser) GetUserRoleList(ctx context.Context, in model.GetUserRoleListInput) (out model.GetUserRoleListOutput, err error) {
-	array, err := dao.SysUserRole.Ctx(ctx).
+	roleIds, err := dao.SysUserRole.Ctx(ctx).
 		Where(dao.SysUserRole.Columns().UserId, in.UserId).
 		Array(dao.SysUserRole.Columns().RoleId)
 	if err != nil {
 		return model.GetUserRoleListOutput{}, err
 	}
-	for _, roleId := range array {
-		output, err := service.Role().GetRoleById(ctx, model.GetRoleByIdInput{RoleId: roleId.Int64()})
+	for _, roleId := range roleIds {
+		output, err := service.Role().GetRoleById(model.GetRoleByIdInput{RoleId: roleId.Int64()})
 		if err != nil {
 			return model.GetUserRoleListOutput{}, err
 		}
