@@ -27,7 +27,10 @@ func (s *sGoods) GetGoodsById(ctx context.Context, in model.GetGoodsByIdInput) (
 }
 
 func (s *sGoods) GetGoodsList(ctx context.Context, in model.GetGoodsListInput) (out model.GetGoodsListOutput, err error) {
-	err = dao.Goods.Ctx(ctx).WhereLike(dao.Goods.Columns().GoodsName, "%"+*in.GoodsName+"%").Scan(&out.List)
+	err = dao.Goods.Ctx(ctx).
+		WhereLike(dao.Goods.Columns().GoodsName, "%"+*in.GoodsName+"%").
+		OrderDesc(dao.Goods.Columns().GoodsStatus).
+		Scan(&out.List)
 	return
 }
 
@@ -66,6 +69,25 @@ func (s *sGoods) GetGoodsSuppliers(ctx context.Context, in model.GetGoodsSupplie
 }
 
 func (s *sGoods) AddGoodsSupplier(ctx context.Context, in model.AddGoodsSupplierInput) (err error) {
+	// 判断商品是否停用
+	goods, err := s.GetGoodsById(ctx, model.GetGoodsByIdInput{GoodsId: in.GoodsId})
+	if err != nil {
+		return err
+	}
+	if goods.GoodsStatus == 0 {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "该商品已停用")
+	}
+
+	// 判断供应商是否停用
+	supplier, err := service.Supplier().GetSupplierById(ctx, model.GetSupplierByIdInput{SupplierId: in.SupplierId})
+	if err != nil {
+		return err
+	}
+	if supplier.SupplierStatus == 0 {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "该供应商已停用")
+	}
+
+	// 判断供应商是否已存在
 	count, err := dao.GoodsSupplierRel.Ctx(ctx).Count(g.Map{
 		dao.GoodsSupplierRel.Columns().GoodsId:    in.GoodsId,
 		dao.GoodsSupplierRel.Columns().SupplierId: in.SupplierId,
@@ -76,6 +98,7 @@ func (s *sGoods) AddGoodsSupplier(ctx context.Context, in model.AddGoodsSupplier
 	if count > 0 {
 		return gerror.NewCode(gcode.CodeInvalidParameter, "该供应商已存在")
 	}
+
 	_, err = dao.GoodsSupplierRel.Ctx(ctx).Insert(in)
 	return
 }

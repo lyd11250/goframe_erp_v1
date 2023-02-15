@@ -19,7 +19,7 @@ func init() {
 }
 
 func (s *sCustomer) GetCustomerList(ctx context.Context) (out model.GetCustomerListOutput, err error) {
-	err = dao.Customer.Ctx(ctx).Scan(&out.List)
+	err = dao.Customer.Ctx(ctx).OrderDesc(dao.Customer.Columns().CustomerStatus).Scan(&out.List)
 	return
 }
 

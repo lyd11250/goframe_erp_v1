@@ -43,7 +43,7 @@ func (s *sUser) GetUserByUserName(ctx context.Context, in model.GetUserByUserNam
 }
 
 func (s *sUser) GetUserList(ctx context.Context) (out model.GetUserListOutput, err error) {
-	err = dao.SysUser.Ctx(ctx).Scan(&out.List)
+	err = dao.SysUser.Ctx(ctx).OrderDesc(dao.SysUser.Columns().UserStatus).Scan(&out.List)
 	return
 }
 

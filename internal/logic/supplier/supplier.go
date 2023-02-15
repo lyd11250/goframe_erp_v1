@@ -19,7 +19,7 @@ func init() {
 }
 
 func (s *sSupplier) GetSupplierList(ctx context.Context) (out model.GetSupplierListOutput, err error) {
-	err = dao.Supplier.Ctx(ctx).Scan(&out.List)
+	err = dao.Supplier.Ctx(ctx).OrderDesc(dao.Supplier.Columns().SupplierStatus).Scan(&out.List)
 	return
 }
 
