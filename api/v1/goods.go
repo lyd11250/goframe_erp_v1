@@ -55,3 +55,46 @@ type GetGoodsUnitsReq struct {
 type GetGoodsUnitsRes struct {
 	List []string `json:"list"`
 }
+
+type GetGoodsSuppliersReq struct {
+	g.Meta  `path:"/goods/suppliers" method:"post" summary:"获取商品供应商"`
+	GoodsId int64 `json:"goodsId" dc:"商品ID" v:"required#请输入商品ID"`
+}
+
+type GoodsSupplierRel struct {
+	SupplierId  int64   `json:"supplierId"`
+	SupplyPrice float64 `json:"supplyPrice"`
+}
+
+type GetGoodsSuppliersRes struct {
+	List []GoodsSupplierRel `json:"list"`
+}
+
+type AddGoodsSupplierReq struct {
+	g.Meta      `path:"/goods/supplier/add" method:"post" summary:"新增商品供应商"`
+	GoodsId     int64   `json:"goodsId"    dc:"商品ID" v:"required#请输入商品ID"`
+	SupplierId  int64   `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
+	SupplyPrice float64 `json:"supplyPrice" dc:"供应价格" v:"float#供应价格必须为数字"`
+}
+
+type AddGoodsSupplierRes struct {
+}
+
+type UpdateGoodsSupplierReq struct {
+	g.Meta      `path:"/goods/supplier/update" method:"post" summary:"修改商品供应商"`
+	GoodsId     int64   `json:"goodsId"    dc:"商品ID" v:"required#请输入商品ID"`
+	SupplierId  int64   `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
+	SupplyPrice float64 `json:"supplyPrice" dc:"供应价格" v:"float#供应价格必须为数字"`
+}
+
+type UpdateGoodsSupplierRes struct {
+}
+
+type DeleteGoodsSupplierReq struct {
+	g.Meta     `path:"/goods/supplier/delete" method:"post" summary:"删除商品供应商"`
+	GoodsId    int64 `json:"goodsId"    dc:"商品ID" v:"required#请输入商品ID"`
+	SupplierId int64 `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
+}
+
+type DeleteGoodsSupplierRes struct {
+}

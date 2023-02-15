@@ -12,14 +12,14 @@ database:
     ctxKeys: ["RequestId"]
 
   default:
-    link:   "mysql:root:123456@tcp(127.0.0.1:3306)/erp"
+    link:   "mysql:root:123456@tcp(localhost:3306)/erp"
     debug:  true
 
 # Redis配置
 redis:
   default:
-    address: 127.0.0.1:6379
-    db:      1
+    address: localhost:6379
+    db:      0
 
 app:
   path: "D:/Files/erp/"

@@ -2,6 +2,9 @@ package goods
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
@@ -51,5 +54,44 @@ func (s *sGoods) GetGoodsUnits(ctx context.Context) (out model.GetGoodsUnitsOutp
 	for _, v := range result.Array() {
 		out.List = append(out.List, v.String())
 	}
+	return
+}
+
+func (s *sGoods) GetGoodsSuppliers(ctx context.Context, in model.GetGoodsSuppliersInput) (out model.GetGoodsSuppliersOutput, err error) {
+	err = dao.GoodsSupplierRel.Ctx(ctx).
+		Fields(dao.GoodsSupplierRel.Columns().SupplierId, dao.GoodsSupplierRel.Columns().SupplyPrice).
+		OrderAsc(dao.GoodsSupplierRel.Columns().SupplyPrice).
+		Scan(&out.List, dao.GoodsSupplierRel.Columns().GoodsId, in.GoodsId)
+	return
+}
+
+func (s *sGoods) AddGoodsSupplier(ctx context.Context, in model.AddGoodsSupplierInput) (err error) {
+	count, err := dao.GoodsSupplierRel.Ctx(ctx).Count(g.Map{
+		dao.GoodsSupplierRel.Columns().GoodsId:    in.GoodsId,
+		dao.GoodsSupplierRel.Columns().SupplierId: in.SupplierId,
+	})
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "该供应商已存在")
+	}
+	_, err = dao.GoodsSupplierRel.Ctx(ctx).Insert(in)
+	return
+}
+
+func (s *sGoods) UpdateGoodsSupplier(ctx context.Context, in model.UpdateGoodsSupplierInput) (err error) {
+	_, err = dao.GoodsSupplierRel.Ctx(ctx).
+		Data(dao.GoodsSupplierRel.Columns().SupplyPrice, in.SupplyPrice).
+		Where(g.Map{
+			dao.GoodsSupplierRel.Columns().GoodsId:    in.GoodsId,
+			dao.GoodsSupplierRel.Columns().SupplierId: in.SupplierId,
+		}).
+		Update()
+	return
+}
+
+func (s *sGoods) DeleteGoodsSupplier(ctx context.Context, in model.DeleteGoodsSupplierInput) (err error) {
+	_, err = dao.GoodsSupplierRel.Ctx(ctx).Delete(in)
 	return
 }

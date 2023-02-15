@@ -41,3 +41,33 @@ type UpdateGoodsInput struct {
 type GetGoodsUnitsOutput struct {
 	List []string
 }
+
+type GetGoodsSuppliersInput struct {
+	GoodsId int64
+}
+
+type GoodsSupplierRel struct {
+	SupplierId  int64
+	SupplyPrice float64
+}
+
+type GetGoodsSuppliersOutput struct {
+	List []GoodsSupplierRel
+}
+
+type AddGoodsSupplierInput struct {
+	GoodsId     int64
+	SupplierId  int64
+	SupplyPrice float64
+}
+
+type UpdateGoodsSupplierInput struct {
+	GoodsId     int64
+	SupplierId  int64
+	SupplyPrice float64
+}
+
+type DeleteGoodsSupplierInput struct {
+	GoodsId    int64
+	SupplierId int64
+}
