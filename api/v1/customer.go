@@ -8,8 +8,8 @@ import (
 type CustomerInfo struct {
 	CustomerName      string `json:"customerName" dc:"客户名称" v:"required#请输入客户名称"`
 	CustomerDesc      string `json:"customerDesc" dc:"客户描述" v:"required#请输入客户描述"`
-	CustomerTelephone string `json:"customerTelephone" dc:"客户座机号码" v:"required#请输入客户座机号码"`
-	CustomerPhone     string `json:"customerPhone" dc:"客户手机号码" v:"required#请输入客户手机号码"`
+	CustomerTelephone string `json:"customerTelephone" dc:"客户座机号码" `
+	CustomerPhone     string `json:"customerPhone" dc:"客户手机号码" `
 	CustomerAddress   string `json:"customerAddress" dc:"客户地址" v:"required#请输入客户地址"`
 	CustomerStatus    int8   `json:"customerStatus" dc:"客户状态" v:"required#请输入客户状态"`
 }
