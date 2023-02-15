@@ -2,6 +2,8 @@ package supplier
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
@@ -29,6 +31,14 @@ func (s *sSupplier) UpdateSupplier(ctx context.Context, in model.UpdateSupplierI
 }
 
 func (s *sSupplier) AddSupplier(ctx context.Context, in model.AddSupplierInput) (out model.AddSupplierOutput, err error) {
+	// 判断供应商名称是否存在
+	count, err := dao.Supplier.Ctx(ctx).Count(dao.Supplier.Columns().SupplierName, in.SupplierName)
+	if err != nil {
+		return model.AddSupplierOutput{}, err
+	}
+	if count > 0 {
+		return model.AddSupplierOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "供应商已存在")
+	}
 	id, err := dao.Supplier.Ctx(ctx).InsertAndGetId(in)
 	if err != nil {
 		return model.AddSupplierOutput{}, err

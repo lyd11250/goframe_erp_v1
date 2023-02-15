@@ -2,6 +2,8 @@ package customer
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
@@ -29,6 +31,14 @@ func (s *sCustomer) UpdateCustomer(ctx context.Context, in model.UpdateCustomerI
 }
 
 func (s *sCustomer) AddCustomer(ctx context.Context, in model.AddCustomerInput) (out model.AddCustomerOutput, err error) {
+	// 判断客户名称是否存在
+	count, err := dao.Customer.Ctx(ctx).Count(dao.Customer.Columns().CustomerName, in.CustomerName)
+	if err != nil {
+		return model.AddCustomerOutput{}, err
+	}
+	if count > 0 {
+		return model.AddCustomerOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "客户已存在")
+	}
 	id, err := dao.Customer.Ctx(ctx).InsertAndGetId(in)
 	if err != nil {
 		return model.AddCustomerOutput{}, err
