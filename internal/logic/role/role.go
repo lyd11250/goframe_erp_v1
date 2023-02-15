@@ -46,6 +46,14 @@ func (s *sRole) GetRoleById(in model.GetRoleByIdInput) (out model.GetRoleByIdOut
 }
 
 func (s *sRole) AddRole(ctx context.Context, in model.AddRoleInput) (out model.AddRoleOutput, err error) {
+	// 判断角色名称是否存在
+	count, err := dao.SysRole.Ctx(ctx).Count(dao.SysRole.Columns().RoleName, in.RoleName)
+	if err != nil {
+		return model.AddRoleOutput{}, err
+	}
+	if count > 0 {
+		return model.AddRoleOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "角色已存在")
+	}
 	id, err := dao.SysRole.Ctx(ctx).InsertAndGetId(g.Map{
 		dao.SysRole.Columns().RoleName: in.RoleName,
 	})
@@ -53,6 +61,7 @@ func (s *sRole) AddRole(ctx context.Context, in model.AddRoleInput) (out model.A
 		return model.AddRoleOutput{}, err
 	}
 	out.RoleId = id
+	service.RegisterRole(New())
 	return
 }
 
@@ -60,6 +69,7 @@ func (s *sRole) UpdateRole(ctx context.Context, in model.UpdateRoleInput) (err e
 	_, err = dao.SysRole.Ctx(ctx).WherePri(in.RoleId).Data(g.Map{
 		dao.SysRole.Columns().RoleName: in.RoleName,
 	}).Update()
+	service.RegisterRole(New())
 	return
 }
 
@@ -84,6 +94,7 @@ func (s *sRole) DeleteRole(ctx context.Context, in model.DeleteRoleInput) (err e
 		}
 		return nil
 	})
+	service.RegisterRole(New())
 	return
 }
 

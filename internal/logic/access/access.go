@@ -46,6 +46,17 @@ func (s *sAccess) GetAccessById(in model.GetAccessByIdInput) (out model.GetAcces
 }
 
 func (s *sAccess) AddAccess(ctx context.Context, in model.AddAccessInput) (out model.AddAccessOutput, err error) {
+	// 判断权限是否存在
+	count, err := dao.SysAccess.Ctx(ctx).
+		Where(dao.SysAccess.Columns().AccessTitle, in.AccessTitle).
+		WhereOr(dao.SysAccess.Columns().AccessUri, in.AccessUri).
+		Count()
+	if err != nil {
+		return model.AddAccessOutput{}, err
+	}
+	if count > 0 {
+		return model.AddAccessOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "权限已存在")
+	}
 	id, err := dao.SysAccess.Ctx(ctx).InsertAndGetId(g.Map{
 		dao.SysAccess.Columns().AccessTitle: in.AccessTitle,
 		dao.SysAccess.Columns().AccessUri:   in.AccessUri,
@@ -54,6 +65,7 @@ func (s *sAccess) AddAccess(ctx context.Context, in model.AddAccessInput) (out m
 		return model.AddAccessOutput{}, err
 	}
 	out.AccessId = id
+	service.RegisterAccess(New())
 	return
 }
 
@@ -62,6 +74,7 @@ func (s *sAccess) UpdateAccess(ctx context.Context, in model.UpdateAccessInput) 
 		dao.SysAccess.Columns().AccessTitle: in.AccessTitle,
 		dao.SysAccess.Columns().AccessUri:   in.AccessUri,
 	}).Update()
+	service.RegisterAccess(New())
 	return
 }
 
@@ -80,5 +93,6 @@ func (s *sAccess) DeleteAccess(ctx context.Context, in model.DeleteAccessInput) 
 		}
 		return nil
 	})
+	service.RegisterAccess(New())
 	return
 }
