@@ -6,10 +6,11 @@ package entity
 
 // Goods is the golang structure for table goods.
 type Goods struct {
-	GoodsId     int64  `json:"goodsId"     ` // 商品ID
-	GoodsName   string `json:"goodsName"   ` // 商品名称
-	GoodsDesc   string `json:"goodsDesc"   ` // 商品描述
-	GoodsUnit   string `json:"goodsUnit"   ` // 商品单位
-	GoodsImg    string `json:"goodsImg"    ` // 商品主图
-	GoodsStatus int    `json:"goodsStatus" ` // 商品状态
+	GoodsId     int64   `json:"goodsId"     ` // 商品ID
+	GoodsName   string  `json:"goodsName"   ` // 商品名称
+	GoodsDesc   string  `json:"goodsDesc"   ` // 商品描述
+	GoodsUnit   string  `json:"goodsUnit"   ` // 商品单位
+	GoodsPrice  float64 `json:"goodsPrice"  ` // 商品售价
+	GoodsImg    string  `json:"goodsImg"    ` // 商品主图
+	GoodsStatus int     `json:"goodsStatus" ` // 商品状态
 }

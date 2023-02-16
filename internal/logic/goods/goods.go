@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
+	"goframe-erp-v1/internal/consts"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
@@ -69,21 +70,12 @@ func (s *sGoods) GetGoodsSuppliers(ctx context.Context, in model.GetGoodsSupplie
 }
 
 func (s *sGoods) AddGoodsSupplier(ctx context.Context, in model.AddGoodsSupplierInput) (err error) {
-	// 判断商品是否停用
-	goods, err := s.GetGoodsById(ctx, model.GetGoodsByIdInput{GoodsId: in.GoodsId})
-	if err != nil {
-		return err
-	}
-	if goods.GoodsStatus == 0 {
-		return gerror.NewCode(gcode.CodeInvalidParameter, "该商品已停用")
-	}
-
 	// 判断供应商是否停用
 	supplier, err := service.Supplier().GetSupplierById(ctx, model.GetSupplierByIdInput{SupplierId: in.SupplierId})
 	if err != nil {
 		return err
 	}
-	if supplier.SupplierStatus == 0 {
+	if supplier.SupplierStatus == consts.StatusDisabled {
 		return gerror.NewCode(gcode.CodeInvalidParameter, "该供应商已停用")
 	}
 

@@ -24,11 +24,12 @@ type GetGoodsListRes struct {
 }
 
 type AddGoodsReq struct {
-	g.Meta    `path:"/goods/add" method:"post" summary:"新增商品"`
-	GoodsName string `json:"goodsName"  dc:"商品名称" v:"required#请输入商品名称"`
-	GoodsDesc string `json:"goodsDesc"  dc:"商品描述" v:"required#请输入商品描述"`
-	GoodsUnit string `json:"goodsUnit"  dc:"商品单位" v:"required#请输入商品单位"`
-	GoodsImg  string `json:"goodsImg"   dc:"商品主图" v:"required#请输入商品主图"`
+	g.Meta     `path:"/goods/add" method:"post" summary:"新增商品"`
+	GoodsName  string  `json:"goodsName"  dc:"商品名称" v:"required#请输入商品名称"`
+	GoodsDesc  string  `json:"goodsDesc"  dc:"商品描述" v:"required#请输入商品描述"`
+	GoodsUnit  string  `json:"goodsUnit"  dc:"商品单位" v:"required#请输入商品单位"`
+	GoodsPrice float64 `json:"goodsPrice" dc:"商品价格" v:"float#商品价格必须为数字"`
+	GoodsImg   string  `json:"goodsImg"   dc:"商品主图" v:"required#请输入商品主图"`
 }
 
 type AddGoodsRes struct {
@@ -37,12 +38,13 @@ type AddGoodsRes struct {
 
 type UpdateGoodsReq struct {
 	g.Meta      `path:"/goods/update" method:"post" summary:"修改商品"`
-	GoodsId     *int64  `json:"goodsId"     dc:"商品ID"`
-	GoodsName   *string `json:"goodsName"   dc:"商品名称"`
-	GoodsDesc   *string `json:"goodsDesc"   dc:"商品描述"`
-	GoodsUnit   *string `json:"goodsUnit"   dc:"商品单位"`
-	GoodsImg    *string `json:"goodsImg"    dc:"商品主图"`
-	GoodsStatus *int    `json:"goodsStatus" dc:"商品状态"`
+	GoodsId     *int64   `json:"goodsId"     dc:"商品ID"`
+	GoodsName   *string  `json:"goodsName"   dc:"商品名称"`
+	GoodsDesc   *string  `json:"goodsDesc"   dc:"商品描述"`
+	GoodsUnit   *string  `json:"goodsUnit"   dc:"商品单位"`
+	GoodsPrice  *float64 `json:"goodsPrice"  dc:"商品价格"`
+	GoodsImg    *string  `json:"goodsImg"    dc:"商品主图"`
+	GoodsStatus *int     `json:"goodsStatus" dc:"商品状态"`
 }
 
 type UpdateGoodsRes struct {

@@ -19,10 +19,11 @@ type GetGoodsListOutput struct {
 }
 
 type AddGoodsInput struct {
-	GoodsName string // 商品名称
-	GoodsDesc string // 商品描述
-	GoodsUnit string // 商品单位
-	GoodsImg  string // 商品主图
+	GoodsName  string  // 商品名称
+	GoodsDesc  string  // 商品描述
+	GoodsUnit  string  // 商品单位
+	GoodsPrice float64 // 商品价格
+	GoodsImg   string  // 商品主图
 }
 
 type AddGoodsOutput struct {
@@ -34,6 +35,7 @@ type UpdateGoodsInput struct {
 	GoodsName   *string // 商品名称
 	GoodsDesc   *string // 商品描述
 	GoodsUnit   *string // 商品单位
+	GoodsPrice  *string // 商品价格
 	GoodsImg    *string // 商品主图
 	GoodsStatus *int    // 商品状态
 }

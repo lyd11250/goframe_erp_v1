@@ -15,6 +15,7 @@ type Goods struct {
 	GoodsName   interface{} // 商品名称
 	GoodsDesc   interface{} // 商品描述
 	GoodsUnit   interface{} // 商品单位
+	GoodsPrice  interface{} // 商品售价
 	GoodsImg    interface{} // 商品主图
 	GoodsStatus interface{} // 商品状态
 }

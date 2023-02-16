@@ -36,6 +36,9 @@ func (c *cGoods) GetGoodsList(ctx context.Context, req *v1.GetGoodsListReq) (res
 }
 
 func (c *cGoods) AddGoods(ctx context.Context, req *v1.AddGoodsReq) (res *v1.AddGoodsRes, err error) {
+	if req.GoodsPrice <= 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品价格必须大于0")
+	}
 	input := model.AddGoodsInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
@@ -50,6 +53,9 @@ func (c *cGoods) AddGoods(ctx context.Context, req *v1.AddGoodsReq) (res *v1.Add
 }
 
 func (c *cGoods) UpdateGoods(ctx context.Context, req *v1.UpdateGoodsReq) (res *v1.UpdateGoodsRes, err error) {
+	if *req.GoodsPrice <= 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品价格必须大于0")
+	}
 	input := model.UpdateGoodsInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {

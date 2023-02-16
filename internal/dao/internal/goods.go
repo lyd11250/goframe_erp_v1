@@ -24,6 +24,7 @@ type GoodsColumns struct {
 	GoodsName   string // 商品名称
 	GoodsDesc   string // 商品描述
 	GoodsUnit   string // 商品单位
+	GoodsPrice  string // 商品售价
 	GoodsImg    string // 商品主图
 	GoodsStatus string // 商品状态
 }
@@ -34,6 +35,7 @@ var goodsColumns = GoodsColumns{
 	GoodsName:   "goods_name",
 	GoodsDesc:   "goods_desc",
 	GoodsUnit:   "goods_unit",
+	GoodsPrice:  "goods_price",
 	GoodsImg:    "goods_img",
 	GoodsStatus: "goods_status",
 }
