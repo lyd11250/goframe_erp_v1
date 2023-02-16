@@ -3,8 +3,10 @@ package user
 import (
 	"context"
 	"github.com/gogf/gf/v2/crypto/gmd5"
+	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
+	"goframe-erp-v1/internal/consts"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/model/entity"
@@ -56,6 +58,9 @@ func (s *sUser) UserLogin(ctx context.Context, in model.UserLoginInput) (out mod
 	if err != nil {
 		return out, gerror.New("用户名或密码错误")
 	}
+	if user.UserStatus == consts.StatusDisabled {
+		return model.UserLoginOutput{}, gerror.NewCodef(gcode.CodeInvalidParameter, "用户已被禁用")
+	}
 	out.UserInfo = convertDbEntityToOutput(user)
 	return
 }
@@ -88,7 +93,7 @@ func (s *sUser) AddUser(ctx context.Context, in model.AddUserInput) (out model.A
 	// 输入对象转换为DB对象
 	user := g.Map{
 		dao.SysUser.Columns().UserName:     in.UserName,
-		dao.SysUser.Columns().UserPassword: encryptPassword("123456"),
+		dao.SysUser.Columns().UserPassword: encryptPassword(consts.DefaultPassword),
 		dao.SysUser.Columns().UserRealName: in.UserRealName,
 		dao.SysUser.Columns().UserPhone:    in.UserPhone,
 		dao.SysUser.Columns().UserImage:    in.UserImage,
