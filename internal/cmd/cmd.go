@@ -34,6 +34,7 @@ var (
 					controller.Supplier,
 					controller.Customer,
 					controller.Goods,
+					controller.Inventory,
 					controller.File,
 				)
 			})
