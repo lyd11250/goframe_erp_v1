@@ -6,7 +6,7 @@ import (
 )
 
 type GetAccessListReq struct {
-	g.Meta `path:"/access/list" method:"post" summary:"获取权限列表"`
+	g.Meta `path:"/access/list" method:"post" summary:"获取权限列表" tags:"权限管理"`
 }
 
 type GetAccessListRes struct {
@@ -14,7 +14,7 @@ type GetAccessListRes struct {
 }
 
 type AddAccessReq struct {
-	g.Meta      `path:"/access/add" method:"post" summary:"新增权限"`
+	g.Meta      `path:"/access/add" method:"post" summary:"新增权限" tags:"权限管理"`
 	AccessTitle string `json:"accessTitle" dc:"权限标题" v:"required#请输入权限标题"`
 	AccessUri   string `json:"accessUri"  dc:"权限Uri" v:"required#请输入权限Uri"`
 }
@@ -24,7 +24,7 @@ type AddAccessRes struct {
 }
 
 type UpdateAccessReq struct {
-	g.Meta      `path:"/access/update" method:"post" summary:"修改权限"`
+	g.Meta      `path:"/access/update" method:"post" summary:"修改权限" tags:"权限管理"`
 	AccessId    *int64  `json:"accessId" dc:"权限ID" v:"required#请输入权限ID"`
 	AccessTitle *string `json:"accessTitle" dc:"权限标题" `
 	AccessUri   *string `json:"accessUri"  dc:"权限Uri" `
@@ -34,7 +34,7 @@ type UpdateAccessRes struct {
 }
 
 type DeleteAccessReq struct {
-	g.Meta   `path:"/access/delete" method:"post" summary:"删除权限"`
+	g.Meta   `path:"/access/delete" method:"post" summary:"删除权限" tags:"权限管理"`
 	AccessId int64 `json:"accessId" dc:"权限ID" v:"required#请输入权限ID"`
 }
 

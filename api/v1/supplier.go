@@ -15,7 +15,7 @@ type SupplierInfo struct {
 }
 
 type GetSupplierListReq struct {
-	g.Meta `path:"/supplier/list" method:"post" summary:"获取供应商列表"`
+	g.Meta `path:"/supplier/list" method:"post" summary:"获取供应商列表" tags:"供应商管理"`
 }
 
 type GetSupplierListRes struct {
@@ -23,7 +23,7 @@ type GetSupplierListRes struct {
 }
 
 type UpdateSupplierReq struct {
-	g.Meta            `path:"/supplier/update" method:"post" summary:"修改供应商"`
+	g.Meta            `path:"/supplier/update" method:"post" summary:"修改供应商" tags:"供应商管理"`
 	SupplierId        *int64  `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
 	SupplierName      *string `json:"supplierName" dc:"供应商名称"`
 	SupplierDesc      *string `json:"supplierDesc" dc:"供应商描述"`
@@ -37,7 +37,7 @@ type UpdateSupplierRes struct {
 }
 
 type AddSupplierReq struct {
-	g.Meta `path:"/supplier/add" method:"post" summary:"新增供应商"`
+	g.Meta `path:"/supplier/add" method:"post" summary:"新增供应商" tags:"供应商管理"`
 	SupplierInfo
 }
 
@@ -46,7 +46,7 @@ type AddSupplierRes struct {
 }
 
 type GetSupplierByIdReq struct {
-	g.Meta     `path:"/supplier/id" method:"post" summary:"通过ID获取供应商"`
+	g.Meta     `path:"/supplier/id" method:"post" summary:"通过ID获取供应商" tags:"供应商管理"`
 	SupplierId int64 `json:"supplierId"`
 }
 

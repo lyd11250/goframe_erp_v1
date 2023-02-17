@@ -6,7 +6,7 @@ import (
 )
 
 type GetGoodsByIdReq struct {
-	g.Meta  `path:"/goods/id" method:"post" summary:"通过ID获取商品"`
+	g.Meta  `path:"/goods/id" method:"post" summary:"通过ID获取商品" tags:"商品管理"`
 	GoodsId int64 `json:"goodsId" dc:"商品ID" v:"required#请输入商品ID"`
 }
 
@@ -14,17 +14,17 @@ type GetGoodsByIdRes struct {
 	entity.Goods
 }
 
-type GetGoodsListReq struct {
-	g.Meta    `path:"/goods/list" method:"post" summary:"获取所有商品"`
+type GetGoodsByNameReq struct {
+	g.Meta    `path:"/goods/name" method:"post" summary:"获取所有商品" tags:"商品管理"`
 	GoodsName *string `json:"goodsName" dc:"商品名称" v:"required#请输入商品名称"`
 }
 
-type GetGoodsListRes struct {
+type GetGoodsByNameRes struct {
 	List []entity.Goods `json:"list"`
 }
 
 type AddGoodsReq struct {
-	g.Meta     `path:"/goods/add" method:"post" summary:"新增商品"`
+	g.Meta     `path:"/goods/add" method:"post" summary:"新增商品" tags:"商品管理"`
 	GoodsName  string  `json:"goodsName"  dc:"商品名称" v:"required#请输入商品名称"`
 	GoodsDesc  string  `json:"goodsDesc"  dc:"商品描述" v:"required#请输入商品描述"`
 	GoodsUnit  string  `json:"goodsUnit"  dc:"商品单位" v:"required#请输入商品单位"`
@@ -37,7 +37,7 @@ type AddGoodsRes struct {
 }
 
 type UpdateGoodsReq struct {
-	g.Meta      `path:"/goods/update" method:"post" summary:"修改商品"`
+	g.Meta      `path:"/goods/update" method:"post" summary:"修改商品" tags:"商品管理"`
 	GoodsId     *int64   `json:"goodsId"     dc:"商品ID"`
 	GoodsName   *string  `json:"goodsName"   dc:"商品名称"`
 	GoodsDesc   *string  `json:"goodsDesc"   dc:"商品描述"`
@@ -51,7 +51,7 @@ type UpdateGoodsRes struct {
 }
 
 type GetGoodsUnitsReq struct {
-	g.Meta `path:"/goods/units" method:"post" summary:"获取所有商品单位"`
+	g.Meta `path:"/goods/units" method:"post" summary:"获取所有商品单位" tags:"商品管理"`
 }
 
 type GetGoodsUnitsRes struct {
@@ -59,7 +59,7 @@ type GetGoodsUnitsRes struct {
 }
 
 type GetGoodsSuppliersReq struct {
-	g.Meta  `path:"/goods/suppliers" method:"post" summary:"获取商品供应商"`
+	g.Meta  `path:"/goods/suppliers" method:"post" summary:"获取商品供应商" tags:"商品管理"`
 	GoodsId int64 `json:"goodsId" dc:"商品ID" v:"required#请输入商品ID"`
 }
 
@@ -73,7 +73,7 @@ type GetGoodsSuppliersRes struct {
 }
 
 type AddGoodsSupplierReq struct {
-	g.Meta      `path:"/goods/supplier/add" method:"post" summary:"新增商品供应商"`
+	g.Meta      `path:"/goods/supplier/add" method:"post" summary:"新增商品供应商" tags:"商品管理"`
 	GoodsId     int64   `json:"goodsId"    dc:"商品ID" v:"required#请输入商品ID"`
 	SupplierId  int64   `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
 	SupplyPrice float64 `json:"supplyPrice" dc:"供应价格" v:"float#供应价格必须为数字"`
@@ -83,7 +83,7 @@ type AddGoodsSupplierRes struct {
 }
 
 type UpdateGoodsSupplierReq struct {
-	g.Meta      `path:"/goods/supplier/update" method:"post" summary:"修改商品供应商"`
+	g.Meta      `path:"/goods/supplier/update" method:"post" summary:"修改商品供应商" tags:"商品管理"`
 	GoodsId     int64   `json:"goodsId"    dc:"商品ID" v:"required#请输入商品ID"`
 	SupplierId  int64   `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
 	SupplyPrice float64 `json:"supplyPrice" dc:"供应价格" v:"float#供应价格必须为数字"`
@@ -93,7 +93,7 @@ type UpdateGoodsSupplierRes struct {
 }
 
 type DeleteGoodsSupplierReq struct {
-	g.Meta     `path:"/goods/supplier/delete" method:"post" summary:"删除商品供应商"`
+	g.Meta     `path:"/goods/supplier/delete" method:"post" summary:"删除商品供应商" tags:"商品管理"`
 	GoodsId    int64 `json:"goodsId"    dc:"商品ID" v:"required#请输入商品ID"`
 	SupplierId int64 `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
 }

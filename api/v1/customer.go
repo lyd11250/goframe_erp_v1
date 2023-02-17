@@ -15,7 +15,7 @@ type CustomerInfo struct {
 }
 
 type GetCustomerListReq struct {
-	g.Meta `path:"/customer/list" method:"post" summary:"获取客户列表"`
+	g.Meta `path:"/customer/list" method:"post" summary:"获取客户列表" tags:"客户管理"`
 }
 
 type GetCustomerListRes struct {
@@ -23,7 +23,7 @@ type GetCustomerListRes struct {
 }
 
 type UpdateCustomerReq struct {
-	g.Meta            `path:"/customer/update" method:"post" summary:"修改客户"`
+	g.Meta            `path:"/customer/update" method:"post" summary:"修改客户" tags:"客户管理"`
 	CustomerId        *int64  `json:"customerId" dc:"客户ID" v:"required#请输入客户ID"`
 	CustomerName      *string `json:"customerName" dc:"客户名称"`
 	CustomerDesc      *string `json:"customerDesc" dc:"客户描述"`
@@ -37,7 +37,7 @@ type UpdateCustomerRes struct {
 }
 
 type AddCustomerReq struct {
-	g.Meta `path:"/customer/add" method:"post" summary:"新增客户"`
+	g.Meta `path:"/customer/add" method:"post" summary:"新增客户" tags:"客户管理"`
 	CustomerInfo
 }
 
@@ -46,7 +46,7 @@ type AddCustomerRes struct {
 }
 
 type GetCustomerByIdReq struct {
-	g.Meta     `path:"/customer/id" method:"post" summary:"通过ID获取客户"`
+	g.Meta     `path:"/customer/id" method:"post" summary:"通过ID获取客户" tags:"客户管理"`
 	CustomerId int64 `json:"customerId"`
 }
 

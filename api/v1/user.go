@@ -16,7 +16,7 @@ type UserInfo struct {
 }
 
 type GetUserByIdReq struct {
-	g.Meta `path:"/user/id" method:"post" summary:"通过ID获取用户信息"`
+	g.Meta `path:"/user/id" method:"post" summary:"通过ID获取用户信息" tags:"用户管理"`
 	UserId *int64 `json:"userId" dc:"用户ID"`
 }
 
@@ -25,7 +25,7 @@ type GetUserByIdRes struct {
 }
 
 type GetUserByUserNameReq struct {
-	g.Meta   `path:"/user/name" method:"post" summary:"通过用户名获取用户信息"`
+	g.Meta   `path:"/user/name" method:"post" summary:"通过用户名获取用户信息" tags:"用户管理"`
 	UserName string `json:"userName" dc:"用户名" v:"required#请输入用户名"`
 }
 
@@ -34,7 +34,7 @@ type GetUserByUserNameRes struct {
 }
 
 type UserLoginReq struct {
-	g.Meta       `path:"/user/login" method:"post" summary:"用户登录"`
+	g.Meta       `path:"/user/login" method:"post" summary:"用户登录" tags:"用户管理"`
 	UserName     string `json:"userName" dc:"用户名" v:"required#请输入用户名"`
 	UserPassword string `json:"userPassword" dc:"密码" v:"required#请输入密码"`
 }
@@ -44,14 +44,14 @@ type UserLoginRes struct {
 }
 
 type UserLogoutReq struct {
-	g.Meta `path:"/user/logout" method:"post" summary:"用户登出"`
+	g.Meta `path:"/user/logout" method:"post" summary:"用户登出" tags:"用户管理"`
 }
 
 type UserLogoutRes struct {
 }
 
 type UpdateUserReq struct {
-	g.Meta       `path:"/user/update" method:"post" summary:"修改用户"`
+	g.Meta       `path:"/user/update" method:"post" summary:"修改用户" tags:"用户管理"`
 	UserId       *int64  `json:"userId" dc:"用户ID" v:"required#请输入用户ID"`
 	UserName     *string `json:"userName" dc:"用户名" v:"passport#用户名不合法"`
 	UserPassword *string `json:"userPassword" dc:"密码"`
@@ -65,7 +65,7 @@ type UpdateUserRes struct {
 }
 
 type AddUserReq struct {
-	g.Meta       `path:"/user/add" method:"post" summary:"新增用户"`
+	g.Meta       `path:"/user/add" method:"post" summary:"新增用户" tags:"用户管理"`
 	UserName     string `json:"userName" dc:"用户名" v:"required#请输入用户名|passport#用户名不合法"`
 	UserRealName string `json:"userRealName" dc:"真实姓名" v:"required#请输入真实姓名"`
 	UserPhone    string `json:"userPhone" dc:"手机号码" v:"required#请输入手机号码|phone#请输入正确的手机号"`
@@ -78,7 +78,7 @@ type AddUserRes struct {
 }
 
 type AddUserRoleReq struct {
-	g.Meta `path:"/user/role/add" method:"post" summary:"用户新增角色"`
+	g.Meta `path:"/user/role/add" method:"post" summary:"用户新增角色" tags:"用户管理"`
 	UserId int64 `json:"userId" dc:"用户ID" v:"required#请输入用户ID"`
 	RoleId int64 `json:"roleId" dc:"角色ID" v:"required#请输入角色ID"`
 }
@@ -87,7 +87,7 @@ type AddUserRoleRes struct {
 }
 
 type DeleteUserRoleReq struct {
-	g.Meta `path:"/user/role/delete" method:"post" summary:"用户删除角色"`
+	g.Meta `path:"/user/role/delete" method:"post" summary:"用户删除角色" tags:"用户管理"`
 	UserId int64 `json:"userId" dc:"用户ID" v:"required#请输入用户ID"`
 	RoleId int64 `json:"roleId" dc:"角色ID" v:"required#请输入角色ID"`
 }
@@ -96,7 +96,7 @@ type DeleteUserRoleRes struct {
 }
 
 type GetUserListReq struct {
-	g.Meta `path:"/user/list" method:"post" summary:"获取所有用户"`
+	g.Meta `path:"/user/list" method:"post" summary:"获取所有用户" tags:"用户管理"`
 }
 
 type GetUserListRes struct {
