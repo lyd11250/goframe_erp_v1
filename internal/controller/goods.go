@@ -24,14 +24,14 @@ func (c *cGoods) GetGoodsById(ctx context.Context, req *v1.GetGoodsByIdReq) (res
 	return
 }
 
-func (c *cGoods) GetGoodsList(ctx context.Context, req *v1.GetGoodsListReq) (res *v1.GetGoodsListRes, err error) {
-	output, err := service.Goods().GetGoodsList(ctx, model.GetGoodsListInput{
+func (c *cGoods) GetGoodsByName(ctx context.Context, req *v1.GetGoodsByNameReq) (res *v1.GetGoodsByNameRes, err error) {
+	output, err := service.Goods().GetGoodsByName(ctx, model.GetGoodsByNameInput{
 		GoodsName: req.GoodsName,
 	})
 	if err != nil {
 		return nil, err
 	}
-	res = &v1.GetGoodsListRes{List: output.List}
+	res = &v1.GetGoodsByNameRes{List: output.List}
 	return
 }
 

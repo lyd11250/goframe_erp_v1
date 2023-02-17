@@ -10,11 +10,11 @@ type GetGoodsByIdOutput struct {
 	entity.Goods
 }
 
-type GetGoodsListInput struct {
+type GetGoodsByNameInput struct {
 	GoodsName *string
 }
 
-type GetGoodsListOutput struct {
+type GetGoodsByNameOutput struct {
 	List []entity.Goods
 }
 
@@ -72,4 +72,12 @@ type UpdateGoodsSupplierInput struct {
 type DeleteGoodsSupplierInput struct {
 	GoodsId    int64
 	SupplierId int64
+}
+
+type CheckGoodsEnabledInput struct {
+	GoodsId int64
+}
+
+type CheckGoodsEnabledOutput struct {
+	Enabled bool
 }
