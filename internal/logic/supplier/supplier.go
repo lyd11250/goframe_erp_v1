@@ -4,8 +4,10 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
+	"goframe-erp-v1/internal/consts"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/entity"
 	"goframe-erp-v1/internal/service"
 )
 
@@ -49,5 +51,15 @@ func (s *sSupplier) AddSupplier(ctx context.Context, in model.AddSupplierInput) 
 
 func (s *sSupplier) GetSupplierById(ctx context.Context, in model.GetSupplierByIdInput) (out model.GetSupplierByIdOutput, err error) {
 	err = dao.Supplier.Ctx(ctx).WherePri(in.SupplierId).Scan(&out)
+	return
+}
+
+func (s *sSupplier) CheckSupplierEnabled(ctx context.Context, supplierId int64) (enabled bool, err error) {
+	var supplier entity.Supplier
+	err = dao.Supplier.Ctx(ctx).WherePri(supplierId).Scan(&supplier)
+	if err != nil {
+		return false, err
+	}
+	enabled = supplier.SupplierStatus == consts.StatusEnabled
 	return
 }

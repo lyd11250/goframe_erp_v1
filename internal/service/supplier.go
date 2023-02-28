@@ -16,6 +16,7 @@ type (
 		UpdateSupplier(ctx context.Context, in model.UpdateSupplierInput) (err error)
 		AddSupplier(ctx context.Context, in model.AddSupplierInput) (out model.AddSupplierOutput, err error)
 		GetSupplierById(ctx context.Context, in model.GetSupplierByIdInput) (out model.GetSupplierByIdOutput, err error)
+		CheckSupplierEnabled(ctx context.Context, supplierId int64) (enabled bool, err error)
 	}
 )
 

@@ -16,6 +16,7 @@ type (
 		UpdateCustomer(ctx context.Context, in model.UpdateCustomerInput) (err error)
 		AddCustomer(ctx context.Context, in model.AddCustomerInput) (out model.AddCustomerOutput, err error)
 		GetCustomerById(ctx context.Context, in model.GetCustomerByIdInput) (out model.GetCustomerByIdOutput, err error)
+		CheckCustomerEnabled(ctx context.Context, customerId int64) (enabled bool, err error)
 	}
 )
 
