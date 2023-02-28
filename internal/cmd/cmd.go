@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/os/gtime"
 	"goframe-erp-v1/internal/service"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -35,14 +36,19 @@ var (
 					controller.Customer,
 					controller.Goods,
 					controller.Inventory,
+					controller.Order,
 					controller.File,
 				)
 			})
 			path, err := g.Cfg().Get(ctx, "app.path")
 			if err != nil {
-				return err
+				panic(err)
 			}
 			s.AddStaticPath("/file", path.String())
+			err = gtime.SetTimeZone("Asia/Shanghai")
+			if err != nil {
+				panic(err)
+			}
 			s.Run()
 			return nil
 		},
