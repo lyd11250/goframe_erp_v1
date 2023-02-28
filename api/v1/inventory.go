@@ -37,6 +37,16 @@ type GetGoodsInventoryReq struct {
 
 type GetGoodsInventoryRes struct {
 	List   []entity.Inventory `json:"list"`
-	Sum    int                `json:"sum"`
-	Amount float64            `json:"amount"`
+	Sum    int                `json:"sum" dc:"总数量"`
+	Amount float64            `json:"amount" dc:"总金额"`
+}
+
+type GetInventoryStatisticReq struct {
+	g.Meta `path:"/inventory/statistic" method:"post" summary:"获取库存统计数据" tags:"库存管理"`
+}
+
+type GetInventoryStatisticRes struct {
+	Amount  float64 `json:"amount" dc:"总金额"`
+	Sum     int     `json:"sum" dc:"总数量"`
+	Average float64 `json:"average" dc:"平均价格"`
 }

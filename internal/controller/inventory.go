@@ -45,3 +45,12 @@ func (c *cInventory) GetGoodsInventory(ctx context.Context, req *v1.GetGoodsInve
 	err = gconv.Struct(output, &res)
 	return
 }
+
+func (c *cInventory) GetInventoryStatistic(ctx context.Context, req *v1.GetInventoryStatisticReq) (res *v1.GetInventoryStatisticRes, err error) {
+	output, err := service.Inventory().GetInventoryStatistic(ctx)
+	if err != nil {
+		return
+	}
+	err = gconv.Struct(output, &res)
+	return
+}

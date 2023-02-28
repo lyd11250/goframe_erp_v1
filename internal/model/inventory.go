@@ -38,3 +38,9 @@ type DeleteInventoryInput struct {
 	GoodsId   int64
 	GoodsCost float64
 }
+
+type GetInventoryStatisticOutput struct {
+	Amount  float64
+	Sum     int
+	Average float64
+}

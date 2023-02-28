@@ -18,6 +18,7 @@ type (
 		UpdateInventory(ctx context.Context, in model.UpdateInventoryInput) (err error)
 		ReduceInventory(ctx context.Context, in model.ReduceInventoryInput) (err error)
 		GetGoodsInventory(ctx context.Context, in model.GetGoodsInventoryInput) (out model.GetGoodsInventoryOutput, err error)
+		GetInventoryStatistic(ctx context.Context) (out model.GetInventoryStatisticOutput, err error)
 	}
 )
 

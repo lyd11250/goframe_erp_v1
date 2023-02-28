@@ -187,3 +187,14 @@ func (s *sInventory) GetGoodsInventory(ctx context.Context, in model.GetGoodsInv
 
 	return
 }
+
+func (s *sInventory) GetInventoryStatistic(ctx context.Context) (out model.GetInventoryStatisticOutput, err error) {
+	err = dao.Inventory.Ctx(ctx).
+		Fields("sum(quantity) as sum, sum(quantity * goods_cost) as amount").
+		Scan(&out)
+	if err != nil {
+		return
+	}
+	out.Average = out.Amount / float64(out.Sum)
+	return
+}
