@@ -81,3 +81,15 @@ type CheckGoodsEnabledInput struct {
 type CheckGoodsEnabledOutput struct {
 	Enabled bool
 }
+
+type GetGoodsListBySupplierInput struct {
+	SupplierId int64
+}
+
+type GetGoodsListBySupplierOutput struct {
+	List []entity.Goods
+}
+
+type GetGoodsListOutput struct {
+	List []entity.Goods
+}

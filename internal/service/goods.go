@@ -22,6 +22,8 @@ type (
 		UpdateGoodsSupplier(ctx context.Context, in model.UpdateGoodsSupplierInput) (err error)
 		DeleteGoodsSupplier(ctx context.Context, in model.DeleteGoodsSupplierInput) (err error)
 		CheckGoodsEnabled(ctx context.Context, in model.CheckGoodsEnabledInput) (out model.CheckGoodsEnabledOutput, err error)
+		GetGoodsListBySupplier(ctx context.Context, in model.GetGoodsListBySupplierInput) (out model.GetGoodsListBySupplierOutput, err error)
+		GetGoodsList(ctx context.Context) (out model.GetGoodsListOutput, err error)
 	}
 )
 

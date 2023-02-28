@@ -117,3 +117,23 @@ func (c *cGoods) DeleteGoodsSupplier(ctx context.Context, req *v1.DeleteGoodsSup
 		})
 	return
 }
+
+func (c *cGoods) GetGoodsListBySupplier(ctx context.Context, req *v1.GetGoodsListBySupplierReq) (res *v1.GetGoodsListBySupplierRes, err error) {
+	output, err := service.Goods().GetGoodsListBySupplier(ctx, model.GetGoodsListBySupplierInput{
+		SupplierId: req.SupplierId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	res = &v1.GetGoodsListBySupplierRes{List: output.List}
+	return
+}
+
+func (c *cGoods) GetGoodsList(ctx context.Context, req *v1.GetGoodsListReq) (res *v1.GetGoodsListRes, err error) {
+	output, err := service.Goods().GetGoodsList(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res = &v1.GetGoodsListRes{List: output.List}
+	return
+}

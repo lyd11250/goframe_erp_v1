@@ -136,3 +136,23 @@ func (s *sGoods) CheckGoodsEnabled(ctx context.Context, in model.CheckGoodsEnabl
 	out.Enabled = result.Map()["goods_status"] == consts.StatusEnabled
 	return
 }
+
+func (s *sGoods) GetGoodsListBySupplier(ctx context.Context, in model.GetGoodsListBySupplierInput) (out model.GetGoodsListBySupplierOutput, err error) {
+	result, err := dao.GoodsSupplierRel.Ctx(ctx).
+		Fields(dao.GoodsSupplierRel.Columns().GoodsId).
+		All(dao.GoodsSupplierRel.Columns().SupplierId, in.SupplierId)
+	if err != nil {
+		return model.GetGoodsListBySupplierOutput{}, err
+	}
+	resultArray := result.Array()
+	if len(resultArray) == 0 {
+		return out, gerror.NewCode(gcode.CodeNotFound, "该供应商未配置商品")
+	}
+	err = dao.Goods.Ctx(ctx).WhereIn(dao.Goods.Columns().GoodsId, resultArray).Scan(&out.List)
+	return
+}
+
+func (s *sGoods) GetGoodsList(ctx context.Context) (out model.GetGoodsListOutput, err error) {
+	err = dao.Goods.Ctx(ctx).Scan(&out.List)
+	return
+}

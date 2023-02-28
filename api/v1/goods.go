@@ -100,3 +100,20 @@ type DeleteGoodsSupplierReq struct {
 
 type DeleteGoodsSupplierRes struct {
 }
+
+type GetGoodsListBySupplierReq struct {
+	g.Meta     `path:"/goods/supplier" method:"post" summary:"获取供应商商品列表" tags:"商品管理"`
+	SupplierId int64 `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
+}
+
+type GetGoodsListBySupplierRes struct {
+	List []entity.Goods `json:"list"`
+}
+
+type GetGoodsListReq struct {
+	g.Meta `path:"/goods/list" method:"post" summary:"获取所有商品" tags:"商品管理"`
+}
+
+type GetGoodsListRes struct {
+	List []entity.Goods `json:"list"`
+}
