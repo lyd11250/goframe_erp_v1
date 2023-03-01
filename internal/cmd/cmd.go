@@ -36,7 +36,6 @@ var (
 					controller.Customer,
 					controller.Goods,
 					controller.Inventory,
-					controller.Order,
 					controller.File,
 				)
 			})

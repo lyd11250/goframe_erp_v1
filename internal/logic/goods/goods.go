@@ -133,7 +133,7 @@ func (s *sGoods) CheckGoodsEnabled(ctx context.Context, in model.CheckGoodsEnabl
 	if result.IsEmpty() {
 		return out, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
 	}
-	out.Enabled = result.Map()["goods_status"] == consts.StatusEnabled
+	out.Enabled = result.GMap().GetVar(dao.Goods.Columns().GoodsStatus).Int() == consts.StatusEnabled
 	return
 }
 

@@ -6,7 +6,8 @@ package entity
 
 // Inventory is the golang structure for table inventory.
 type Inventory struct {
-	GoodsId   int64   `json:"goodsId"   ` // 库存商品ID
-	GoodsCost float64 `json:"goodsCost" ` // 商品成本
-	Quantity  int     `json:"quantity"  ` // 库存数量
+	GoodsId  int64   `json:"goodsId"  ` // 商品ID
+	Quantity int     `json:"quantity" ` // 库存数量
+	Amount   float64 `json:"amount"   ` // 总金额
+	Price    float64 `json:"price"    ` // 单位金额
 }

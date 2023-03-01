@@ -2,10 +2,9 @@ package inventory
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
-	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
 	"goframe-erp-v1/internal/dao"
 	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/model/entity"
@@ -23,178 +22,101 @@ func init() {
 	service.RegisterInventory(New())
 }
 
-func (s *sInventory) CheckInventory(ctx context.Context, in model.CheckInventoryInput) (out model.CheckInventoryOutput, err error) {
-	quantity, err := dao.Inventory.Ctx(ctx).
-		Where(dao.Inventory.Columns().GoodsId, in.GoodsId).
-		Sum(dao.Inventory.Columns().Quantity)
-	if err != nil {
-		return model.CheckInventoryOutput{}, err
-	}
-	out.Enough = quantity >= float64(in.Quantity)
-	return
-}
-
-func (s *sInventory) DeleteInventory(ctx context.Context, in model.DeleteInventoryInput) (err error) {
-	_, err = dao.Inventory.Ctx(ctx).Where(in).Delete()
-	return
-}
-
-func (s *sInventory) AddInventory(ctx context.Context, in model.AddInventoryInput) (err error) {
-	// 检查商品是否停用
-	goodsEnabledOutput, err := service.Goods().CheckGoodsEnabled(ctx, model.CheckGoodsEnabledInput{GoodsId: in.GoodsId})
-	if err != nil {
-		return err
-	}
-	if !goodsEnabledOutput.Enabled {
-		return gerror.NewCode(gcode.CodeInvalidParameter, "商品已停用")
-	}
-
-	// 检查库存是否存在
-	currentInventoryOutput, err := dao.Inventory.Ctx(ctx).
-		Where(g.Map{
-			dao.Inventory.Columns().GoodsId:   in.GoodsId,
-			dao.Inventory.Columns().GoodsCost: in.GoodsCost,
-		}).One()
-	if err != nil {
-		return err
-	}
-
-	// 不存在则新增
-	if currentInventoryOutput.IsEmpty() {
-		_, err = dao.Inventory.Ctx(ctx).Insert(in)
-		return
-	}
-
-	// 存在则更新
-	var currentInventory entity.Inventory
-	err = currentInventoryOutput.Struct(&currentInventory)
-	if err != nil {
-		return err
-	}
-	currentInventory.Quantity += in.Quantity
-	err = s.UpdateInventory(ctx, model.UpdateInventoryInput{Inventory: currentInventory})
-	return
-}
-
-func (s *sInventory) UpdateInventory(ctx context.Context, in model.UpdateInventoryInput) (err error) {
-	// 检查库存数量是否小于0
-	if in.Quantity < 0 {
-		return gerror.NewCode(gcode.CodeInvalidParameter, "库存数量不能小于0")
-	}
-	// 检查库存数量是否等于0，等于0则删除
-	if in.Quantity == 0 {
-		err = s.DeleteInventory(ctx, model.DeleteInventoryInput{
-			GoodsId:   in.GoodsId,
-			GoodsCost: in.GoodsCost,
-		})
-		return
-	}
-	_, err = dao.Inventory.Ctx(ctx).
-		Data(dao.Inventory.Columns().Quantity, in.Quantity).
-		Where(g.Map{
-			dao.Inventory.Columns().GoodsId:   in.GoodsId,
-			dao.Inventory.Columns().GoodsCost: in.GoodsCost,
-		}).
-		Update()
-	return
-}
-
-func (s *sInventory) ReduceInventory(ctx context.Context, in model.ReduceInventoryInput) (err error) {
-	// 检查商品是否停用
-	goodsEnabledOutput, err := service.Goods().CheckGoodsEnabled(ctx, model.CheckGoodsEnabledInput{GoodsId: in.GoodsId})
-	if err != nil {
-		return err
-	}
-	if !goodsEnabledOutput.Enabled {
-		return gerror.NewCode(gcode.CodeInvalidParameter, "商品已停用")
-	}
-
-	// 检查库存是否存在
-	currentInventoriesOutput, err := dao.Inventory.Ctx(ctx).
-		Where(dao.Inventory.Columns().GoodsId, in.GoodsId).
-		OrderAsc(dao.Inventory.Columns().GoodsCost).
-		All()
-	if err != nil {
-		return err
-	}
-	if currentInventoriesOutput.IsEmpty() {
-		return gerror.NewCode(gcode.CodeInvalidParameter, "库存不足")
-	}
-
-	// 检查库存是否足够
-	checkInventoryOutput, err := s.CheckInventory(ctx, model.CheckInventoryInput{
-		GoodsId:  in.GoodsId,
-		Quantity: in.Quantity,
-	})
-	if err != nil {
-		return err
-	}
-	if !checkInventoryOutput.Enough {
-		return gerror.NewCode(gcode.CodeInvalidParameter, "库存不足")
-	}
-
-	// 减库存
-	var currentInventories []entity.Inventory
-	err = currentInventoriesOutput.Structs(&currentInventories)
-	if err != nil {
-		return err
-	}
-	quantity := in.Quantity
-	for i := range currentInventories {
-		if quantity <= 0 {
-			break
-		}
-		if currentInventories[i].Quantity >= quantity {
-			currentInventories[i].Quantity -= quantity
-			quantity = 0
-		} else {
-			quantity -= currentInventories[i].Quantity
-			currentInventories[i].Quantity = 0
-		}
-	}
-
-	// 更新库存事务
-	err = dao.Inventory.Transaction(ctx, func(ctx context.Context, tx gdb.TX) (e error) {
-		for i := range currentInventories {
-			_, e = dao.Inventory.Ctx(ctx).TX(tx).
-				Data(dao.Inventory.Columns().Quantity, currentInventories[i].Quantity).
-				Where(g.Map{
-					dao.Inventory.Columns().GoodsId:   currentInventories[i].GoodsId,
-					dao.Inventory.Columns().GoodsCost: currentInventories[i].GoodsCost,
-				}).
-				Update()
-			if e != nil {
-				return
-			}
-		}
-		return
-	})
-	return
-}
-
 func (s *sInventory) GetGoodsInventory(ctx context.Context, in model.GetGoodsInventoryInput) (out model.GetGoodsInventoryOutput, err error) {
-	err = dao.Inventory.Ctx(ctx).
-		Where(dao.Inventory.Columns().GoodsId, in.GoodsId).
-		OrderAsc(dao.Inventory.Columns().GoodsCost).
-		Scan(&out.List)
+	_, err = service.Goods().GetGoodsById(ctx, model.GetGoodsByIdInput{GoodsId: in.GoodsId})
 	if err != nil {
+		return out, err
+	}
+	result, err := dao.Inventory.Ctx(ctx).WherePri(in.GoodsId).One()
+	if err != nil {
+		return out, err
+	}
+	if result.IsEmpty() {
+		out = model.GetGoodsInventoryOutput{
+			Inventory: entity.Inventory{
+				GoodsId:  in.GoodsId,
+				Quantity: 0,
+				Price:    0,
+				Amount:   0,
+			},
+		}
 		return
 	}
-	for _, inventory := range out.List {
-		out.Sum += inventory.Quantity
-		out.Amount += inventory.GoodsCost * float64(inventory.Quantity)
-	}
-
+	err = gconv.Struct(result, &out)
 	return
 }
 
-func (s *sInventory) GetInventoryStatistic(ctx context.Context) (out model.GetInventoryStatisticOutput, err error) {
-	err = dao.Inventory.Ctx(ctx).
-		Fields("sum(quantity) as sum, sum(quantity * goods_cost) as amount").
-		Scan(&out)
+func (s *sInventory) GetInventoryList(ctx context.Context, in model.GetInventoryListInput) (out model.GetInventoryListOutput, err error) {
+	err = dao.Inventory.Ctx(ctx).Page(in.Page, in.PageSize).Scan(&out.List)
 	if err != nil {
 		return
 	}
-	out.Average = out.Amount / float64(out.Sum)
+	out.Total, err = dao.Inventory.Ctx(ctx).Count()
+	if err != nil {
+		return
+	}
+	out.Pages = out.Total / in.PageSize
+	if out.Total%in.PageSize > 0 {
+		out.Pages++
+	}
+	return
+}
+
+func (s *sInventory) AddInventory(ctx context.Context, in model.AddInventoryInput) (out model.AddInventoryOutput, err error) {
+	// 检查输入
+	if in.Quantity <= 0 || in.Price < 0 {
+		return out, gerror.NewCode(gcode.CodeInvalidParameter, "数量或单价不能小于0")
+	}
+	if float64(in.Quantity)*in.Price != in.Amount {
+		return out, gerror.NewCode(gcode.CodeInvalidParameter, "金额不正确")
+	}
+	// 加权平均法
+	// 1. 获取当前库存
+	currentInventory, err := s.GetGoodsInventory(ctx, model.GetGoodsInventoryInput{GoodsId: in.GoodsId})
+	if err != nil {
+		return
+	}
+	// 若当前库存为0，则直接更新库存
+	if currentInventory.Quantity == 0 {
+		_, err = dao.Inventory.Ctx(ctx).Insert(in)
+		if err != nil {
+			return out, err
+		}
+	}
+	// 2. 若当前库存不为0，则计算新的库存
+	out.Before = currentInventory.Inventory
+	// 3. 计算新的库存
+	currentInventory.Quantity += in.Quantity
+	currentInventory.Amount += in.Amount
+	currentInventory.Price = currentInventory.Amount / float64(currentInventory.Quantity)
+	// 4. 更新库存
+	_, err = dao.Inventory.Ctx(ctx).WherePri(in.GoodsId).Data(currentInventory).Update()
+	if err != nil {
+		return
+	}
+	out.After = currentInventory.Inventory
+	return
+}
+
+func (s *sInventory) ReduceInventory(ctx context.Context, in model.ReduceInventoryInput) (out model.ReduceInventoryOutput, err error) {
+	// 获取当前库存
+	currentInventory, err := s.GetGoodsInventory(ctx, model.GetGoodsInventoryInput{GoodsId: in.GoodsId})
+	if err != nil {
+		return
+	}
+	// 检查库存是否充足
+	if currentInventory.Quantity < in.Quantity {
+		return out, gerror.NewCode(gcode.CodeInvalidParameter, "库存不足")
+	}
+	// 更新返回参数
+	out.Before = currentInventory.Inventory
+	// 更新库存
+	currentInventory.Quantity -= in.Quantity
+	currentInventory.Amount = float64(currentInventory.Quantity) * currentInventory.Price
+	_, err = dao.Inventory.Ctx(ctx).WherePri(in.GoodsId).Data(currentInventory).Update()
+	if err != nil {
+		return
+	}
+	out.After = currentInventory.Inventory
 	return
 }

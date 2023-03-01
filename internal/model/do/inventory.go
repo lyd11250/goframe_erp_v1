@@ -10,8 +10,9 @@ import (
 
 // Inventory is the golang structure of table inventory for DAO operations like Where/Data.
 type Inventory struct {
-	g.Meta    `orm:"table:inventory, do:true"`
-	GoodsId   interface{} // 库存商品ID
-	GoodsCost interface{} // 商品成本
-	Quantity  interface{} // 库存数量
+	g.Meta   `orm:"table:inventory, do:true"`
+	GoodsId  interface{} // 商品ID
+	Quantity interface{} // 库存数量
+	Amount   interface{} // 总金额
+	Price    interface{} // 单位金额
 }

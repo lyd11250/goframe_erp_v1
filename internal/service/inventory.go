@@ -12,13 +12,10 @@ import (
 
 type (
 	IInventory interface {
-		CheckInventory(ctx context.Context, in model.CheckInventoryInput) (out model.CheckInventoryOutput, err error)
-		DeleteInventory(ctx context.Context, in model.DeleteInventoryInput) (err error)
-		AddInventory(ctx context.Context, in model.AddInventoryInput) (err error)
-		UpdateInventory(ctx context.Context, in model.UpdateInventoryInput) (err error)
-		ReduceInventory(ctx context.Context, in model.ReduceInventoryInput) (err error)
 		GetGoodsInventory(ctx context.Context, in model.GetGoodsInventoryInput) (out model.GetGoodsInventoryOutput, err error)
-		GetInventoryStatistic(ctx context.Context) (out model.GetInventoryStatisticOutput, err error)
+		GetInventoryList(ctx context.Context, in model.GetInventoryListInput) (out model.GetInventoryListOutput, err error)
+		AddInventory(ctx context.Context, in model.AddInventoryInput) (out model.AddInventoryOutput, err error)
+		ReduceInventory(ctx context.Context, in model.ReduceInventoryInput) (out model.ReduceInventoryOutput, err error)
 	}
 )
 

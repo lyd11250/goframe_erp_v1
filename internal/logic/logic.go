@@ -11,7 +11,6 @@ import (
 	_ "goframe-erp-v1/internal/logic/goods"
 	_ "goframe-erp-v1/internal/logic/inventory"
 	_ "goframe-erp-v1/internal/logic/middleware"
-	_ "goframe-erp-v1/internal/logic/order"
 	_ "goframe-erp-v1/internal/logic/role"
 	_ "goframe-erp-v1/internal/logic/supplier"
 	_ "goframe-erp-v1/internal/logic/user"

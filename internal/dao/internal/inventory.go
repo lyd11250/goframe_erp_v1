@@ -20,16 +20,18 @@ type InventoryDao struct {
 
 // InventoryColumns defines and stores column names for table inventory.
 type InventoryColumns struct {
-	GoodsId   string // 库存商品ID
-	GoodsCost string // 商品成本
-	Quantity  string // 库存数量
+	GoodsId  string // 商品ID
+	Quantity string // 库存数量
+	Amount   string // 总金额
+	Price    string // 单位金额
 }
 
 // inventoryColumns holds the columns for table inventory.
 var inventoryColumns = InventoryColumns{
-	GoodsId:   "goods_id",
-	GoodsCost: "goods_cost",
-	Quantity:  "quantity",
+	GoodsId:  "goods_id",
+	Quantity: "quantity",
+	Amount:   "amount",
+	Price:    "price",
 }
 
 // NewInventoryDao creates and returns a new DAO object for table data access.
