@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
 	v1 "goframe-erp-v1/api/v1"
-	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/pojo"
 	"goframe-erp-v1/internal/service"
 )
 
@@ -23,7 +23,7 @@ func (c *cCustomer) GetCustomerList(ctx context.Context, req *v1.GetCustomerList
 }
 
 func (c *cCustomer) UpdateCustomer(ctx context.Context, req *v1.UpdateCustomerReq) (res *v1.UpdateCustomerRes, err error) {
-	input := model.UpdateCustomerInput{}
+	input := pojo.UpdateCustomerInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (c *cCustomer) UpdateCustomer(ctx context.Context, req *v1.UpdateCustomerRe
 }
 
 func (c *cCustomer) AddCustomer(ctx context.Context, req *v1.AddCustomerReq) (res *v1.AddCustomerRes, err error) {
-	input := model.AddCustomerInput{}
+	input := pojo.AddCustomerInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (c *cCustomer) AddCustomer(ctx context.Context, req *v1.AddCustomerReq) (re
 }
 
 func (c *cCustomer) GetCustomerById(ctx context.Context, req *v1.GetCustomerByIdReq) (res *v1.GetCustomerByIdRes, err error) {
-	output, err := service.Customer().GetCustomerById(ctx, model.GetCustomerByIdInput{CustomerId: req.CustomerId})
+	output, err := service.Customer().GetCustomerById(ctx, pojo.GetCustomerByIdInput{CustomerId: req.CustomerId})
 	if err != nil {
 		return nil, err
 	}

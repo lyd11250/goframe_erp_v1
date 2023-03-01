@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
 	v1 "goframe-erp-v1/api/v1"
-	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/pojo"
 	"goframe-erp-v1/internal/service"
 )
 
@@ -23,7 +23,7 @@ func (c *cSupplier) GetSupplierList(ctx context.Context, req *v1.GetSupplierList
 }
 
 func (c *cSupplier) UpdateSupplier(ctx context.Context, req *v1.UpdateSupplierReq) (res *v1.UpdateSupplierRes, err error) {
-	input := model.UpdateSupplierInput{}
+	input := pojo.UpdateSupplierInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (c *cSupplier) UpdateSupplier(ctx context.Context, req *v1.UpdateSupplierRe
 }
 
 func (c *cSupplier) AddSupplier(ctx context.Context, req *v1.AddSupplierReq) (res *v1.AddSupplierRes, err error) {
-	input := model.AddSupplierInput{}
+	input := pojo.AddSupplierInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (c *cSupplier) AddSupplier(ctx context.Context, req *v1.AddSupplierReq) (re
 }
 
 func (c *cSupplier) GetSupplierById(ctx context.Context, req *v1.GetSupplierByIdReq) (res *v1.GetSupplierByIdRes, err error) {
-	output, err := service.Supplier().GetSupplierById(ctx, model.GetSupplierByIdInput{SupplierId: req.SupplierId})
+	output, err := service.Supplier().GetSupplierById(ctx, pojo.GetSupplierByIdInput{SupplierId: req.SupplierId})
 	if err != nil {
 		return nil, err
 	}

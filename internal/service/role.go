@@ -7,19 +7,19 @@ package service
 
 import (
 	"context"
-	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/pojo"
 )
 
 type (
 	IRole interface {
-		GetRoleList() (out model.GetRoleListOutput, err error)
-		GetRoleById(in model.GetRoleByIdInput) (out model.GetRoleByIdOutput, err error)
-		AddRole(ctx context.Context, in model.AddRoleInput) (out model.AddRoleOutput, err error)
-		UpdateRole(ctx context.Context, in model.UpdateRoleInput) (err error)
-		DeleteRole(ctx context.Context, in model.DeleteRoleInput) (err error)
-		AddRoleAccess(ctx context.Context, in model.AddRoleAccessInput) (err error)
-		DeleteRoleAccess(ctx context.Context, in model.DeleteRoleAccessInput) (err error)
-		GetRoleAccessList(ctx context.Context, in model.GetRoleAccessListInput) (out model.GetRoleAccessListOutput, err error)
+		GetRoleList() (out pojo.GetRoleListOutput, err error)
+		GetRoleById(in pojo.GetRoleByIdInput) (out pojo.GetRoleByIdOutput, err error)
+		AddRole(ctx context.Context, in pojo.AddRoleInput) (out pojo.AddRoleOutput, err error)
+		UpdateRole(ctx context.Context, in pojo.UpdateRoleInput) (err error)
+		DeleteRole(ctx context.Context, in pojo.DeleteRoleInput) (err error)
+		AddRoleAccess(ctx context.Context, in pojo.AddRoleAccessInput) (err error)
+		DeleteRoleAccess(ctx context.Context, in pojo.DeleteRoleAccessInput) (err error)
+		GetRoleAccessList(ctx context.Context, in pojo.GetRoleAccessListInput) (out pojo.GetRoleAccessListOutput, err error)
 	}
 )
 

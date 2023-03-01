@@ -7,15 +7,15 @@ package service
 
 import (
 	"context"
-	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/pojo"
 )
 
 type (
 	IInventory interface {
-		GetGoodsInventory(ctx context.Context, in model.GetGoodsInventoryInput) (out model.GetGoodsInventoryOutput, err error)
-		GetInventoryList(ctx context.Context, in model.GetInventoryListInput) (out model.GetInventoryListOutput, err error)
-		AddInventory(ctx context.Context, in model.AddInventoryInput) (out model.AddInventoryOutput, err error)
-		ReduceInventory(ctx context.Context, in model.ReduceInventoryInput) (out model.ReduceInventoryOutput, err error)
+		GetGoodsInventory(ctx context.Context, in pojo.GetGoodsInventoryInput) (out pojo.GetGoodsInventoryOutput, err error)
+		GetInventoryList(ctx context.Context, in pojo.GetInventoryListInput) (out pojo.GetInventoryListOutput, err error)
+		AddInventory(ctx context.Context, in pojo.AddInventoryInput) (out pojo.AddInventoryOutput, err error)
+		ReduceInventory(ctx context.Context, in pojo.ReduceInventoryInput) (out pojo.ReduceInventoryOutput, err error)
 	}
 )
 

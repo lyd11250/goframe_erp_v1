@@ -7,16 +7,16 @@ package service
 
 import (
 	"context"
-	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/pojo"
 )
 
 type (
 	IAccess interface {
-		GetAccessList() (out model.GetAccessListOutput, err error)
-		GetAccessById(in model.GetAccessByIdInput) (out model.GetAccessByIdOutput, err error)
-		AddAccess(ctx context.Context, in model.AddAccessInput) (out model.AddAccessOutput, err error)
-		UpdateAccess(ctx context.Context, in model.UpdateAccessInput) (err error)
-		DeleteAccess(ctx context.Context, in model.DeleteAccessInput) (err error)
+		GetAccessList() (out pojo.GetAccessListOutput, err error)
+		GetAccessById(in pojo.GetAccessByIdInput) (out pojo.GetAccessByIdOutput, err error)
+		AddAccess(ctx context.Context, in pojo.AddAccessInput) (out pojo.AddAccessOutput, err error)
+		UpdateAccess(ctx context.Context, in pojo.UpdateAccessInput) (err error)
+		DeleteAccess(ctx context.Context, in pojo.DeleteAccessInput) (err error)
 	}
 )
 

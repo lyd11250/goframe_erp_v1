@@ -7,21 +7,21 @@ package service
 
 import (
 	"context"
-	"goframe-erp-v1/internal/model"
+	"goframe-erp-v1/internal/model/pojo"
 )
 
 type (
 	IUser interface {
-		GetUserById(ctx context.Context, in model.GetUserByIdInput) (out model.GetUserByIdOutput, err error)
-		GetUserByUserName(ctx context.Context, in model.GetUserByUserNameInput) (out model.GetUserByUserNameOutput, err error)
-		GetUserList(ctx context.Context) (out model.GetUserListOutput, err error)
-		UserLogin(ctx context.Context, in model.UserLoginInput) (out model.UserLoginOutput, err error)
-		UpdateUser(ctx context.Context, in model.UpdateUserInput) (err error)
-		AddUser(ctx context.Context, in model.AddUserInput) (out model.AddUserOutput, err error)
-		GetUserAccessList(ctx context.Context, in model.GetUserAccessListInput) (out model.GetUserAccessListOutput, err error)
-		AddUserRole(ctx context.Context, in model.AddUserRoleInput) (err error)
-		DeleteUserRole(ctx context.Context, in model.DeleteUserRoleInput) (err error)
-		GetUserRoleList(ctx context.Context, in model.GetUserRoleListInput) (out model.GetUserRoleListOutput, err error)
+		GetUserById(ctx context.Context, in pojo.GetUserByIdInput) (out pojo.GetUserByIdOutput, err error)
+		GetUserByUserName(ctx context.Context, in pojo.GetUserByUserNameInput) (out pojo.GetUserByUserNameOutput, err error)
+		GetUserList(ctx context.Context) (out pojo.GetUserListOutput, err error)
+		UserLogin(ctx context.Context, in pojo.UserLoginInput) (out pojo.UserLoginOutput, err error)
+		UpdateUser(ctx context.Context, in pojo.UpdateUserInput) (err error)
+		AddUser(ctx context.Context, in pojo.AddUserInput) (out pojo.AddUserOutput, err error)
+		GetUserAccessList(ctx context.Context, in pojo.GetUserAccessListInput) (out pojo.GetUserAccessListOutput, err error)
+		AddUserRole(ctx context.Context, in pojo.AddUserRoleInput) (err error)
+		DeleteUserRole(ctx context.Context, in pojo.DeleteUserRoleInput) (err error)
+		GetUserRoleList(ctx context.Context, in pojo.GetUserRoleListInput) (out pojo.GetUserRoleListOutput, err error)
 	}
 )
 
