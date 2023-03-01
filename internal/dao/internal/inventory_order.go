@@ -23,7 +23,7 @@ type InventoryOrderColumns struct {
 	OrderId       string // 单据ID
 	OrderNo       string // 单号
 	OrderType     string // 单据类型
-	POrderId      string // 源单据ID
+	POrderNo      string // 源单据号
 	OrderAmount   string // 出/入库总金额
 	OrderQuantity string // 出/入库总数
 	CreateTime    string // 制单时间
@@ -39,7 +39,7 @@ var inventoryOrderColumns = InventoryOrderColumns{
 	OrderId:       "order_id",
 	OrderNo:       "order_no",
 	OrderType:     "order_type",
-	POrderId:      "p_order_id",
+	POrderNo:      "p_order_no",
 	OrderAmount:   "order_amount",
 	OrderQuantity: "order_quantity",
 	CreateTime:    "create_time",

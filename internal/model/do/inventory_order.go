@@ -15,7 +15,7 @@ type InventoryOrder struct {
 	OrderId       interface{} // 单据ID
 	OrderNo       interface{} // 单号
 	OrderType     interface{} // 单据类型
-	POrderId      interface{} // 源单据ID
+	POrderNo      interface{} // 源单据号
 	OrderAmount   interface{} // 出/入库总金额
 	OrderQuantity interface{} // 出/入库总数
 	CreateTime    *gtime.Time // 制单时间

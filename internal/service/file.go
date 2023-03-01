@@ -7,12 +7,12 @@ package service
 
 import (
 	"context"
-	"goframe-erp-v1/internal/model/pojo"
+	"goframe-erp-v1/internal/model"
 )
 
 type (
 	IFile interface {
-		Upload(ctx context.Context, input pojo.UploadFileInput) (output pojo.UploadFileOutput, err error)
+		Upload(ctx context.Context, input model.UploadFileInput) (output model.UploadFileOutput, err error)
 	}
 )
 

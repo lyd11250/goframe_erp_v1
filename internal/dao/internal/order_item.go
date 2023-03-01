@@ -20,17 +20,17 @@ type OrderItemDao struct {
 
 // OrderItemColumns defines and stores column names for table order_item.
 type OrderItemColumns struct {
-	OrderId  string // 单据ID
+	OrderNo  string // 单号
 	GoodsId  string // 商品ID
-	Price    string // 出/入库单价
+	Price    string // 单价
 	Amount   string // 订单项总价格
-	Quantity string // 出/入库数量
+	Quantity string // 数量
 	Notes    string // 备注
 }
 
 // orderItemColumns holds the columns for table order_item.
 var orderItemColumns = OrderItemColumns{
-	OrderId:  "order_id",
+	OrderNo:  "order_no",
 	GoodsId:  "goods_id",
 	Price:    "price",
 	Amount:   "amount",

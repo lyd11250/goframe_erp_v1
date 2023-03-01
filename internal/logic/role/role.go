@@ -8,8 +8,8 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"goframe-erp-v1/internal/dao"
+	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/model/entity"
-	"goframe-erp-v1/internal/model/pojo"
 	"goframe-erp-v1/internal/service"
 )
 
@@ -30,42 +30,42 @@ func init() {
 	service.RegisterRole(New())
 }
 
-func (s *sRole) GetRoleList() (out pojo.GetRoleListOutput, err error) {
+func (s *sRole) GetRoleList() (out model.GetRoleListOutput, err error) {
 	out.List = s.RoleList
 	return
 }
 
-func (s *sRole) GetRoleById(in pojo.GetRoleByIdInput) (out pojo.GetRoleByIdOutput, err error) {
+func (s *sRole) GetRoleById(in model.GetRoleByIdInput) (out model.GetRoleByIdOutput, err error) {
 	for _, role := range s.RoleList {
 		if role.RoleId == in.RoleId {
 			out.SysRole = role
 			return
 		}
 	}
-	return pojo.GetRoleByIdOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "角色不存在")
+	return model.GetRoleByIdOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "角色不存在")
 }
 
-func (s *sRole) AddRole(ctx context.Context, in pojo.AddRoleInput) (out pojo.AddRoleOutput, err error) {
+func (s *sRole) AddRole(ctx context.Context, in model.AddRoleInput) (out model.AddRoleOutput, err error) {
 	// 判断角色名称是否存在
 	count, err := dao.SysRole.Ctx(ctx).Count(dao.SysRole.Columns().RoleName, in.RoleName)
 	if err != nil {
-		return pojo.AddRoleOutput{}, err
+		return model.AddRoleOutput{}, err
 	}
 	if count > 0 {
-		return pojo.AddRoleOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "角色已存在")
+		return model.AddRoleOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "角色已存在")
 	}
 	id, err := dao.SysRole.Ctx(ctx).InsertAndGetId(g.Map{
 		dao.SysRole.Columns().RoleName: in.RoleName,
 	})
 	if err != nil {
-		return pojo.AddRoleOutput{}, err
+		return model.AddRoleOutput{}, err
 	}
 	out.RoleId = id
 	service.RegisterRole(New())
 	return
 }
 
-func (s *sRole) UpdateRole(ctx context.Context, in pojo.UpdateRoleInput) (err error) {
+func (s *sRole) UpdateRole(ctx context.Context, in model.UpdateRoleInput) (err error) {
 	_, err = dao.SysRole.Ctx(ctx).WherePri(in.RoleId).Data(g.Map{
 		dao.SysRole.Columns().RoleName: in.RoleName,
 	}).Update()
@@ -73,7 +73,7 @@ func (s *sRole) UpdateRole(ctx context.Context, in pojo.UpdateRoleInput) (err er
 	return
 }
 
-func (s *sRole) DeleteRole(ctx context.Context, in pojo.DeleteRoleInput) (err error) {
+func (s *sRole) DeleteRole(ctx context.Context, in model.DeleteRoleInput) (err error) {
 	err = dao.SysRole.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		// 删除sys_role表中的数据
 		_, e := tx.Model(dao.SysRole.Table()).WherePri(in.RoleId).Delete()
@@ -98,7 +98,7 @@ func (s *sRole) DeleteRole(ctx context.Context, in pojo.DeleteRoleInput) (err er
 	return
 }
 
-func (s *sRole) AddRoleAccess(ctx context.Context, in pojo.AddRoleAccessInput) (err error) {
+func (s *sRole) AddRoleAccess(ctx context.Context, in model.AddRoleAccessInput) (err error) {
 	_, err = dao.SysRoleAccess.Ctx(ctx).Insert(g.Map{
 		dao.SysRoleAccess.Columns().RoleId:   in.RoleId,
 		dao.SysRoleAccess.Columns().AccessId: in.AccessId,
@@ -106,7 +106,7 @@ func (s *sRole) AddRoleAccess(ctx context.Context, in pojo.AddRoleAccessInput) (
 	return
 }
 
-func (s *sRole) DeleteRoleAccess(ctx context.Context, in pojo.DeleteRoleAccessInput) (err error) {
+func (s *sRole) DeleteRoleAccess(ctx context.Context, in model.DeleteRoleAccessInput) (err error) {
 	_, err = dao.SysRoleAccess.Ctx(ctx).Where(g.Map{
 		dao.SysRoleAccess.Columns().AccessId: in.AccessId,
 		dao.SysRoleAccess.Columns().RoleId:   in.RoleId,
@@ -114,17 +114,17 @@ func (s *sRole) DeleteRoleAccess(ctx context.Context, in pojo.DeleteRoleAccessIn
 	return
 }
 
-func (s *sRole) GetRoleAccessList(ctx context.Context, in pojo.GetRoleAccessListInput) (out pojo.GetRoleAccessListOutput, err error) {
+func (s *sRole) GetRoleAccessList(ctx context.Context, in model.GetRoleAccessListInput) (out model.GetRoleAccessListOutput, err error) {
 	result, err := dao.SysRoleAccess.Ctx(ctx).
 		Fields(dao.SysRoleAccess.Columns().AccessId).
 		All(dao.SysRoleAccess.Columns().RoleId, in.RoleId)
 	if err != nil {
-		return pojo.GetRoleAccessListOutput{}, err
+		return model.GetRoleAccessListOutput{}, err
 	}
 	for _, accessId := range result.Array() {
-		output, err := service.Access().GetAccessById(pojo.GetAccessByIdInput{AccessId: accessId.Int64()})
+		output, err := service.Access().GetAccessById(model.GetAccessByIdInput{AccessId: accessId.Int64()})
 		if err != nil {
-			return pojo.GetRoleAccessListOutput{}, err
+			return model.GetRoleAccessListOutput{}, err
 		}
 		out.List = append(out.List, output.SysAccess)
 	}

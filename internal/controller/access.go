@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
 	v1 "goframe-erp-v1/api/v1"
-	"goframe-erp-v1/internal/model/pojo"
+	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
 )
 
@@ -23,7 +23,7 @@ func (c *cAccess) GetAccessList(ctx context.Context, req *v1.GetAccessListReq) (
 }
 
 func (c *cAccess) AddAccess(ctx context.Context, req *v1.AddAccessReq) (res *v1.AddAccessRes, err error) {
-	output, err := service.Access().AddAccess(ctx, pojo.AddAccessInput{
+	output, err := service.Access().AddAccess(ctx, model.AddAccessInput{
 		AccessTitle: req.AccessTitle,
 		AccessUri:   req.AccessUri,
 	})
@@ -35,7 +35,7 @@ func (c *cAccess) AddAccess(ctx context.Context, req *v1.AddAccessReq) (res *v1.
 }
 
 func (c *cAccess) UpdateAccess(ctx context.Context, req *v1.UpdateAccessReq) (res *v1.UpdateAccessRes, err error) {
-	input := pojo.UpdateAccessInput{}
+	input := model.UpdateAccessInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (c *cAccess) UpdateAccess(ctx context.Context, req *v1.UpdateAccessReq) (re
 }
 
 func (c *cAccess) DeleteAccess(ctx context.Context, req *v1.DeleteAccessReq) (res *v1.DeleteAccessRes, err error) {
-	input := pojo.DeleteAccessInput{}
+	input := model.DeleteAccessInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err

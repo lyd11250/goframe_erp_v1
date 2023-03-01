@@ -1,4 +1,4 @@
-package pojo
+package model
 
 import "goframe-erp-v1/internal/model/entity"
 

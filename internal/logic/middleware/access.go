@@ -5,7 +5,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/text/gstr"
 	"goframe-erp-v1/internal/consts"
-	"goframe-erp-v1/internal/model/pojo"
+	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
 	"goframe-erp-v1/utility/redis"
 	"goframe-erp-v1/utility/response"
@@ -28,7 +28,7 @@ func (s *sMiddleware) AccessHandler(r *ghttp.Request) {
 	}
 
 	// 账号禁用验证
-	userInfo, err := service.User().GetUserById(ctx, pojo.GetUserByIdInput{UserId: loginId})
+	userInfo, err := service.User().GetUserById(ctx, model.GetUserByIdInput{UserId: loginId})
 	if err != nil {
 		response.JsonExit(r, gcode.CodeNotAuthorized.Code(), "获取登录信息失败")
 		return
@@ -39,7 +39,7 @@ func (s *sMiddleware) AccessHandler(r *ghttp.Request) {
 	}
 
 	// 权限验证
-	accessList, err := service.User().GetUserAccessList(ctx, pojo.GetUserAccessListInput{UserId: loginId})
+	accessList, err := service.User().GetUserAccessList(ctx, model.GetUserAccessListInput{UserId: loginId})
 	if err != nil {
 		response.JsonExit(r, gcode.CodeNotAuthorized.Code(), "权限认证失败，请联系系统管理员")
 		return

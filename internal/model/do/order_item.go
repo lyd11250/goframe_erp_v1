@@ -11,10 +11,10 @@ import (
 // OrderItem is the golang structure of table order_item for DAO operations like Where/Data.
 type OrderItem struct {
 	g.Meta   `orm:"table:order_item, do:true"`
-	OrderId  interface{} // 单据ID
+	OrderNo  interface{} // 单号
 	GoodsId  interface{} // 商品ID
-	Price    interface{} // 出/入库单价
+	Price    interface{} // 单价
 	Amount   interface{} // 订单项总价格
-	Quantity interface{} // 出/入库数量
+	Quantity interface{} // 数量
 	Notes    interface{} // 备注
 }

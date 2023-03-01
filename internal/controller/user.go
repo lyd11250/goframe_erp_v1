@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
 	v1 "goframe-erp-v1/api/v1"
-	"goframe-erp-v1/internal/model/pojo"
+	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
 	"goframe-erp-v1/utility/redis"
 )
@@ -19,7 +19,7 @@ func (c *cUser) GetUserById(ctx context.Context, req *v1.GetUserByIdReq) (res *v
 		id := redis.Ctx(ctx).CheckLogin()
 		req.UserId = &id
 	}
-	user, err := service.User().GetUserById(ctx, pojo.GetUserByIdInput{
+	user, err := service.User().GetUserById(ctx, model.GetUserByIdInput{
 		UserId: *req.UserId,
 	})
 	if err != nil {
@@ -29,7 +29,7 @@ func (c *cUser) GetUserById(ctx context.Context, req *v1.GetUserByIdReq) (res *v
 	if err != nil {
 		return nil, err
 	}
-	roleList, err := service.User().GetUserRoleList(ctx, pojo.GetUserRoleListInput{UserId: user.UserId})
+	roleList, err := service.User().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: user.UserId})
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (c *cUser) GetUserById(ctx context.Context, req *v1.GetUserByIdReq) (res *v
 }
 
 func (c *cUser) GetUserByUserName(ctx context.Context, req *v1.GetUserByUserNameReq) (res *v1.GetUserByUserNameRes, err error) {
-	user, err := service.User().GetUserByUserName(ctx, pojo.GetUserByUserNameInput{
+	user, err := service.User().GetUserByUserName(ctx, model.GetUserByUserNameInput{
 		UserName: req.UserName,
 	})
 	if err != nil {
@@ -48,7 +48,7 @@ func (c *cUser) GetUserByUserName(ctx context.Context, req *v1.GetUserByUserName
 	if err != nil {
 		return nil, err
 	}
-	roleList, err := service.User().GetUserRoleList(ctx, pojo.GetUserRoleListInput{UserId: user.UserId})
+	roleList, err := service.User().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: user.UserId})
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *cUser) GetUserByUserName(ctx context.Context, req *v1.GetUserByUserName
 }
 
 func (c *cUser) UserLogin(ctx context.Context, req *v1.UserLoginReq) (res *v1.UserLoginRes, err error) {
-	user, err := service.User().UserLogin(ctx, pojo.UserLoginInput{
+	user, err := service.User().UserLogin(ctx, model.UserLoginInput{
 		UserName:     req.UserName,
 		UserPassword: req.UserPassword,
 	})
@@ -69,7 +69,7 @@ func (c *cUser) UserLogin(ctx context.Context, req *v1.UserLoginReq) (res *v1.Us
 		return nil, err
 	}
 	redis.Ctx(ctx).Login(res.UserId)
-	roleList, err := service.User().GetUserRoleList(ctx, pojo.GetUserRoleListInput{UserId: user.UserId})
+	roleList, err := service.User().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: user.UserId})
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (c *cUser) UserLogout(ctx context.Context, req *v1.UserLogoutReq) (res *v1.
 }
 
 func (c *cUser) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (res *v1.UpdateUserRes, err error) {
-	input := pojo.UpdateUserInput{}
+	input := model.UpdateUserInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (c *cUser) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (res *v1.
 }
 
 func (c *cUser) AddUser(ctx context.Context, req *v1.AddUserReq) (res *v1.AddUserRes, err error) {
-	input := pojo.AddUserInput{}
+	input := model.AddUserInput{}
 	err = gconv.Struct(req, &input)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (c *cUser) AddUser(ctx context.Context, req *v1.AddUserReq) (res *v1.AddUse
 	}
 
 	// 用户默认拥有”系统用户“角色
-	err = service.User().AddUserRole(ctx, pojo.AddUserRoleInput{
+	err = service.User().AddUserRole(ctx, model.AddUserRoleInput{
 		UserId: output.UserId,
 		RoleId: 1,
 	})
@@ -120,7 +120,7 @@ func (c *cUser) AddUser(ctx context.Context, req *v1.AddUserReq) (res *v1.AddUse
 }
 
 func (c *cUser) AddUserRole(ctx context.Context, req *v1.AddUserRoleReq) (res *v1.AddUserRoleRes, err error) {
-	err = service.User().AddUserRole(ctx, pojo.AddUserRoleInput{
+	err = service.User().AddUserRole(ctx, model.AddUserRoleInput{
 		UserId: req.UserId,
 		RoleId: req.RoleId,
 	})
@@ -128,7 +128,7 @@ func (c *cUser) AddUserRole(ctx context.Context, req *v1.AddUserRoleReq) (res *v
 }
 
 func (c *cUser) DeleteUserRole(ctx context.Context, req *v1.DeleteUserRoleReq) (res *v1.DeleteUserRoleRes, err error) {
-	err = service.User().DeleteUserRole(ctx, pojo.DeleteUserRoleInput{
+	err = service.User().DeleteUserRole(ctx, model.DeleteUserRoleInput{
 		UserId: req.UserId,
 		RoleId: req.RoleId,
 	})
@@ -145,7 +145,7 @@ func (c *cUser) GetUserList(ctx context.Context, req *v1.GetUserListReq) (res *v
 		return nil, err
 	}
 	for i, user := range res.List {
-		roleList, err := service.User().GetUserRoleList(ctx, pojo.GetUserRoleListInput{UserId: user.UserId})
+		roleList, err := service.User().GetUserRoleList(ctx, model.GetUserRoleListInput{UserId: user.UserId})
 		if err != nil {
 			return nil, err
 		}

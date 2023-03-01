@@ -7,15 +7,15 @@ package service
 
 import (
 	"context"
-	"goframe-erp-v1/internal/model/pojo"
+	"goframe-erp-v1/internal/model"
 )
 
 type (
 	ISupplier interface {
-		GetSupplierList(ctx context.Context) (out pojo.GetSupplierListOutput, err error)
-		UpdateSupplier(ctx context.Context, in pojo.UpdateSupplierInput) (err error)
-		AddSupplier(ctx context.Context, in pojo.AddSupplierInput) (out pojo.AddSupplierOutput, err error)
-		GetSupplierById(ctx context.Context, in pojo.GetSupplierByIdInput) (out pojo.GetSupplierByIdOutput, err error)
+		GetSupplierList(ctx context.Context) (out model.GetSupplierListOutput, err error)
+		UpdateSupplier(ctx context.Context, in model.UpdateSupplierInput) (err error)
+		AddSupplier(ctx context.Context, in model.AddSupplierInput) (out model.AddSupplierOutput, err error)
+		GetSupplierById(ctx context.Context, in model.GetSupplierByIdInput) (out model.GetSupplierByIdOutput, err error)
 		CheckSupplierEnabled(ctx context.Context, supplierId int64) (enabled bool, err error)
 	}
 )

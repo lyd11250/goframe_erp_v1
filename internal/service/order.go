@@ -6,22 +6,16 @@
 package service
 
 import (
-	"context"
-	"goframe-erp-v1/internal/model/pojo/order"
+	"goframe-erp-v1/internal/model"
+
+	"github.com/gogf/gf/v2/os/gtime"
 )
 
 type (
 	IOrder interface {
-		GetInventoryOrder(ctx context.Context, in order.GetInventoryOrderInput) (out order.GetInventoryOrderOutput, err error)
-		GetInventoryOrderList(ctx context.Context, in order.GetInventoryOrderListInput) (out order.GetInventoryOrderListOutput, err error)
-		CreateInventoryOrder(ctx context.Context, in order.CreateInventoryOrderInput) (out order.CreateInventoryOrderOutput, err error)
-		CancelCreateInventoryOrder(ctx context.Context, in order.CancelCreateInventoryOrderInput) (err error)
-		GetPurchaseOrder(ctx context.Context, in order.GetPurchaseOrderInput) (out order.GetPurchaseOrderOutput, err error)
-		GetPurchaseOrderList(ctx context.Context, in order.GetPurchaseOrderListInput) (out order.GetPurchaseOrderListOutput, err error)
-		CreatePurchaseOrder(ctx context.Context, in order.CreatePurchaseOrderInput) (out order.CreatePurchaseOrderOutput, err error)
-		GetSaleOrder(ctx context.Context, in order.GetSaleOrderInput) (out order.GetSaleOrderOutput, err error)
-		GetSaleOrderList(ctx context.Context, in order.GetSaleOrderListInput) (out order.GetSaleOrderListOutput, err error)
-		CreateSaleOrder(ctx context.Context, in order.CreateSaleOrderInput) (out order.CreateSaleOrderOutput, err error)
+		GenerateOrderNo(orderType int, time *gtime.Time) (orderNo string)
+		RegisterType(orderType int, i model.InterfaceOrder)
+		Type(orderType int) (i model.InterfaceOrder)
 	}
 )
 

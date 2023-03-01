@@ -7,7 +7,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"goframe-erp-v1/internal/consts"
 	"goframe-erp-v1/internal/dao"
-	"goframe-erp-v1/internal/model/pojo"
+	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/service"
 )
 
@@ -22,10 +22,10 @@ func init() {
 	service.RegisterGoods(New())
 }
 
-func (s *sGoods) GetGoodsById(ctx context.Context, in pojo.GetGoodsByIdInput) (out pojo.GetGoodsByIdOutput, err error) {
+func (s *sGoods) GetGoodsById(ctx context.Context, in model.GetGoodsByIdInput) (out model.GetGoodsByIdOutput, err error) {
 	result, err := dao.Goods.Ctx(ctx).WherePri(in.GoodsId).One()
 	if err != nil {
-		return pojo.GetGoodsByIdOutput{}, err
+		return model.GetGoodsByIdOutput{}, err
 	}
 	if result.IsEmpty() {
 		return out, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
@@ -34,7 +34,7 @@ func (s *sGoods) GetGoodsById(ctx context.Context, in pojo.GetGoodsByIdInput) (o
 	return
 }
 
-func (s *sGoods) GetGoodsByName(ctx context.Context, in pojo.GetGoodsByNameInput) (out pojo.GetGoodsByNameOutput, err error) {
+func (s *sGoods) GetGoodsByName(ctx context.Context, in model.GetGoodsByNameInput) (out model.GetGoodsByNameOutput, err error) {
 	result, err := dao.Goods.Ctx(ctx).
 		WhereLike(dao.Goods.Columns().GoodsName, "%"+*in.GoodsName+"%").
 		OrderDesc(dao.Goods.Columns().GoodsStatus).
@@ -49,25 +49,25 @@ func (s *sGoods) GetGoodsByName(ctx context.Context, in pojo.GetGoodsByNameInput
 	return
 }
 
-func (s *sGoods) AddGoods(ctx context.Context, in pojo.AddGoodsInput) (out pojo.AddGoodsOutput, err error) {
+func (s *sGoods) AddGoods(ctx context.Context, in model.AddGoodsInput) (out model.AddGoodsOutput, err error) {
 	id, err := dao.Goods.Ctx(ctx).InsertAndGetId(in)
 	if err != nil {
-		return pojo.AddGoodsOutput{}, err
+		return model.AddGoodsOutput{}, err
 	}
 	out.GoodsId = id
 	return
 }
 
-func (s *sGoods) UpdateGoods(ctx context.Context, in pojo.UpdateGoodsInput) (err error) {
+func (s *sGoods) UpdateGoods(ctx context.Context, in model.UpdateGoodsInput) (err error) {
 	_, err = dao.Goods.Ctx(ctx).OmitNil().Data(in).WherePri(in.GoodsId).Update()
 	return
 }
 
-func (s *sGoods) GetGoodsUnits(ctx context.Context) (out pojo.GetGoodsUnitsOutput, err error) {
+func (s *sGoods) GetGoodsUnits(ctx context.Context) (out model.GetGoodsUnitsOutput, err error) {
 	column := dao.Goods.Columns().GoodsUnit
 	result, err := dao.Goods.Ctx(ctx).Fields(column).Group(column).All()
 	if err != nil {
-		return pojo.GetGoodsUnitsOutput{}, err
+		return model.GetGoodsUnitsOutput{}, err
 	}
 	for _, v := range result.Array() {
 		out.List = append(out.List, v.String())
@@ -75,7 +75,7 @@ func (s *sGoods) GetGoodsUnits(ctx context.Context) (out pojo.GetGoodsUnitsOutpu
 	return
 }
 
-func (s *sGoods) GetGoodsSuppliers(ctx context.Context, in pojo.GetGoodsSuppliersInput) (out pojo.GetGoodsSuppliersOutput, err error) {
+func (s *sGoods) GetGoodsSuppliers(ctx context.Context, in model.GetGoodsSuppliersInput) (out model.GetGoodsSuppliersOutput, err error) {
 	err = dao.GoodsSupplierRel.Ctx(ctx).
 		Fields(dao.GoodsSupplierRel.Columns().SupplierId, dao.GoodsSupplierRel.Columns().SupplyPrice).
 		OrderAsc(dao.GoodsSupplierRel.Columns().SupplyPrice).
@@ -83,9 +83,9 @@ func (s *sGoods) GetGoodsSuppliers(ctx context.Context, in pojo.GetGoodsSupplier
 	return
 }
 
-func (s *sGoods) AddGoodsSupplier(ctx context.Context, in pojo.AddGoodsSupplierInput) (err error) {
+func (s *sGoods) AddGoodsSupplier(ctx context.Context, in model.AddGoodsSupplierInput) (err error) {
 	// 判断供应商是否停用
-	supplier, err := service.Supplier().GetSupplierById(ctx, pojo.GetSupplierByIdInput{SupplierId: in.SupplierId})
+	supplier, err := service.Supplier().GetSupplierById(ctx, model.GetSupplierByIdInput{SupplierId: in.SupplierId})
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func (s *sGoods) AddGoodsSupplier(ctx context.Context, in pojo.AddGoodsSupplierI
 	return
 }
 
-func (s *sGoods) UpdateGoodsSupplier(ctx context.Context, in pojo.UpdateGoodsSupplierInput) (err error) {
+func (s *sGoods) UpdateGoodsSupplier(ctx context.Context, in model.UpdateGoodsSupplierInput) (err error) {
 	_, err = dao.GoodsSupplierRel.Ctx(ctx).
 		Data(dao.GoodsSupplierRel.Columns().SupplyPrice, in.SupplyPrice).
 		Where(g.Map{
@@ -120,15 +120,15 @@ func (s *sGoods) UpdateGoodsSupplier(ctx context.Context, in pojo.UpdateGoodsSup
 	return
 }
 
-func (s *sGoods) DeleteGoodsSupplier(ctx context.Context, in pojo.DeleteGoodsSupplierInput) (err error) {
+func (s *sGoods) DeleteGoodsSupplier(ctx context.Context, in model.DeleteGoodsSupplierInput) (err error) {
 	_, err = dao.GoodsSupplierRel.Ctx(ctx).Delete(in)
 	return
 }
 
-func (s *sGoods) CheckGoodsEnabled(ctx context.Context, in pojo.CheckGoodsEnabledInput) (out pojo.CheckGoodsEnabledOutput, err error) {
+func (s *sGoods) CheckGoodsEnabled(ctx context.Context, in model.CheckGoodsEnabledInput) (out model.CheckGoodsEnabledOutput, err error) {
 	result, err := dao.Goods.Ctx(ctx).Fields(dao.Goods.Columns().GoodsStatus).WherePri(in.GoodsId).One()
 	if err != nil {
-		return pojo.CheckGoodsEnabledOutput{}, err
+		return model.CheckGoodsEnabledOutput{}, err
 	}
 	if result.IsEmpty() {
 		return out, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
@@ -137,12 +137,12 @@ func (s *sGoods) CheckGoodsEnabled(ctx context.Context, in pojo.CheckGoodsEnable
 	return
 }
 
-func (s *sGoods) GetGoodsListBySupplier(ctx context.Context, in pojo.GetGoodsListBySupplierInput) (out pojo.GetGoodsListBySupplierOutput, err error) {
+func (s *sGoods) GetGoodsListBySupplier(ctx context.Context, in model.GetGoodsListBySupplierInput) (out model.GetGoodsListBySupplierOutput, err error) {
 	result, err := dao.GoodsSupplierRel.Ctx(ctx).
 		Fields(dao.GoodsSupplierRel.Columns().GoodsId).
 		All(dao.GoodsSupplierRel.Columns().SupplierId, in.SupplierId)
 	if err != nil {
-		return pojo.GetGoodsListBySupplierOutput{}, err
+		return model.GetGoodsListBySupplierOutput{}, err
 	}
 	resultArray := result.Array()
 	if len(resultArray) == 0 {
@@ -152,7 +152,7 @@ func (s *sGoods) GetGoodsListBySupplier(ctx context.Context, in pojo.GetGoodsLis
 	return
 }
 
-func (s *sGoods) GetGoodsList(ctx context.Context) (out pojo.GetGoodsListOutput, err error) {
+func (s *sGoods) GetGoodsList(ctx context.Context) (out model.GetGoodsListOutput, err error) {
 	err = dao.Goods.Ctx(ctx).Scan(&out.List)
 	return
 }

@@ -6,10 +6,10 @@ package entity
 
 // OrderItem is the golang structure for table order_item.
 type OrderItem struct {
-	OrderId  int64   `json:"orderId"  ` // 单据ID
+	OrderNo  string  `json:"orderNo"  ` // 单号
 	GoodsId  int64   `json:"goodsId"  ` // 商品ID
-	Price    float64 `json:"price"    ` // 出/入库单价
+	Price    float64 `json:"price"    ` // 单价
 	Amount   float64 `json:"amount"   ` // 订单项总价格
-	Quantity int     `json:"quantity" ` // 出/入库数量
+	Quantity int     `json:"quantity" ` // 数量
 	Notes    string  `json:"notes"    ` // 备注
 }

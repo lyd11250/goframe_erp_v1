@@ -1,4 +1,4 @@
-package pojo
+package model
 
 import (
 	"github.com/gogf/gf/v2/net/ghttp"

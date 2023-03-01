@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/gtime"
-	"goframe-erp-v1/internal/controller/order"
 	"goframe-erp-v1/internal/service"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -37,7 +36,7 @@ var (
 					controller.Customer,
 					controller.Goods,
 					controller.Inventory,
-					order.Order,
+					controller.Order,
 					controller.File,
 				)
 			})

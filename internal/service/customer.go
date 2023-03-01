@@ -7,15 +7,15 @@ package service
 
 import (
 	"context"
-	"goframe-erp-v1/internal/model/pojo"
+	"goframe-erp-v1/internal/model"
 )
 
 type (
 	ICustomer interface {
-		GetCustomerList(ctx context.Context) (out pojo.GetCustomerListOutput, err error)
-		UpdateCustomer(ctx context.Context, in pojo.UpdateCustomerInput) (err error)
-		AddCustomer(ctx context.Context, in pojo.AddCustomerInput) (out pojo.AddCustomerOutput, err error)
-		GetCustomerById(ctx context.Context, in pojo.GetCustomerByIdInput) (out pojo.GetCustomerByIdOutput, err error)
+		GetCustomerList(ctx context.Context) (out model.GetCustomerListOutput, err error)
+		UpdateCustomer(ctx context.Context, in model.UpdateCustomerInput) (err error)
+		AddCustomer(ctx context.Context, in model.AddCustomerInput) (out model.AddCustomerOutput, err error)
+		GetCustomerById(ctx context.Context, in model.GetCustomerByIdInput) (out model.GetCustomerByIdOutput, err error)
 		CheckCustomerEnabled(ctx context.Context, customerId int64) (enabled bool, err error)
 	}
 )

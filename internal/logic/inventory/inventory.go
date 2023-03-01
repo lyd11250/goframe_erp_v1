@@ -6,8 +6,8 @@ import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/util/gconv"
 	"goframe-erp-v1/internal/dao"
+	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/model/entity"
-	"goframe-erp-v1/internal/model/pojo"
 	"goframe-erp-v1/internal/service"
 )
 
@@ -22,8 +22,8 @@ func init() {
 	service.RegisterInventory(New())
 }
 
-func (s *sInventory) GetGoodsInventory(ctx context.Context, in pojo.GetGoodsInventoryInput) (out pojo.GetGoodsInventoryOutput, err error) {
-	_, err = service.Goods().GetGoodsById(ctx, pojo.GetGoodsByIdInput{GoodsId: in.GoodsId})
+func (s *sInventory) GetGoodsInventory(ctx context.Context, in model.GetGoodsInventoryInput) (out model.GetGoodsInventoryOutput, err error) {
+	_, err = service.Goods().GetGoodsById(ctx, model.GetGoodsByIdInput{GoodsId: in.GoodsId})
 	if err != nil {
 		return out, err
 	}
@@ -32,7 +32,7 @@ func (s *sInventory) GetGoodsInventory(ctx context.Context, in pojo.GetGoodsInve
 		return out, err
 	}
 	if result.IsEmpty() {
-		out = pojo.GetGoodsInventoryOutput{
+		out = model.GetGoodsInventoryOutput{
 			Inventory: entity.Inventory{
 				GoodsId:  in.GoodsId,
 				Quantity: 0,
@@ -46,7 +46,7 @@ func (s *sInventory) GetGoodsInventory(ctx context.Context, in pojo.GetGoodsInve
 	return
 }
 
-func (s *sInventory) GetInventoryList(ctx context.Context, in pojo.GetInventoryListInput) (out pojo.GetInventoryListOutput, err error) {
+func (s *sInventory) GetInventoryList(ctx context.Context, in model.GetInventoryListInput) (out model.GetInventoryListOutput, err error) {
 	err = dao.Inventory.Ctx(ctx).Page(in.Page, in.PageSize).Scan(&out.List)
 	if err != nil {
 		return
@@ -62,7 +62,7 @@ func (s *sInventory) GetInventoryList(ctx context.Context, in pojo.GetInventoryL
 	return
 }
 
-func (s *sInventory) AddInventory(ctx context.Context, in pojo.AddInventoryInput) (out pojo.AddInventoryOutput, err error) {
+func (s *sInventory) AddInventory(ctx context.Context, in model.AddInventoryInput) (out model.AddInventoryOutput, err error) {
 	// 检查输入
 	if in.Quantity <= 0 || in.Price < 0 {
 		return out, gerror.NewCode(gcode.CodeInvalidParameter, "数量或单价不能小于0")
@@ -72,7 +72,7 @@ func (s *sInventory) AddInventory(ctx context.Context, in pojo.AddInventoryInput
 	}
 	// 加权平均法
 	// 1. 获取当前库存
-	currentInventory, err := s.GetGoodsInventory(ctx, pojo.GetGoodsInventoryInput{GoodsId: in.GoodsId})
+	currentInventory, err := s.GetGoodsInventory(ctx, model.GetGoodsInventoryInput{GoodsId: in.GoodsId})
 	if err != nil {
 		return
 	}
@@ -98,9 +98,9 @@ func (s *sInventory) AddInventory(ctx context.Context, in pojo.AddInventoryInput
 	return
 }
 
-func (s *sInventory) ReduceInventory(ctx context.Context, in pojo.ReduceInventoryInput) (out pojo.ReduceInventoryOutput, err error) {
+func (s *sInventory) ReduceInventory(ctx context.Context, in model.ReduceInventoryInput) (out model.ReduceInventoryOutput, err error) {
 	// 获取当前库存
-	currentInventory, err := s.GetGoodsInventory(ctx, pojo.GetGoodsInventoryInput{GoodsId: in.GoodsId})
+	currentInventory, err := s.GetGoodsInventory(ctx, model.GetGoodsInventoryInput{GoodsId: in.GoodsId})
 	if err != nil {
 		return
 	}

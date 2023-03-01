@@ -8,8 +8,8 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"goframe-erp-v1/internal/dao"
+	"goframe-erp-v1/internal/model"
 	"goframe-erp-v1/internal/model/entity"
-	"goframe-erp-v1/internal/model/pojo"
 	"goframe-erp-v1/internal/service"
 )
 
@@ -30,46 +30,46 @@ func init() {
 	service.RegisterAccess(New())
 }
 
-func (s *sAccess) GetAccessList() (out pojo.GetAccessListOutput, err error) {
+func (s *sAccess) GetAccessList() (out model.GetAccessListOutput, err error) {
 	out.List = s.AccessList
 	return
 }
 
-func (s *sAccess) GetAccessById(in pojo.GetAccessByIdInput) (out pojo.GetAccessByIdOutput, err error) {
+func (s *sAccess) GetAccessById(in model.GetAccessByIdInput) (out model.GetAccessByIdOutput, err error) {
 	for _, access := range s.AccessList {
 		if access.AccessId == in.AccessId {
 			out.SysAccess = access
 			return
 		}
 	}
-	return pojo.GetAccessByIdOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "权限不存在")
+	return model.GetAccessByIdOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "权限不存在")
 }
 
-func (s *sAccess) AddAccess(ctx context.Context, in pojo.AddAccessInput) (out pojo.AddAccessOutput, err error) {
+func (s *sAccess) AddAccess(ctx context.Context, in model.AddAccessInput) (out model.AddAccessOutput, err error) {
 	// 判断权限是否存在
 	count, err := dao.SysAccess.Ctx(ctx).
 		Where(dao.SysAccess.Columns().AccessTitle, in.AccessTitle).
 		WhereOr(dao.SysAccess.Columns().AccessUri, in.AccessUri).
 		Count()
 	if err != nil {
-		return pojo.AddAccessOutput{}, err
+		return model.AddAccessOutput{}, err
 	}
 	if count > 0 {
-		return pojo.AddAccessOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "权限已存在")
+		return model.AddAccessOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "权限已存在")
 	}
 	id, err := dao.SysAccess.Ctx(ctx).InsertAndGetId(g.Map{
 		dao.SysAccess.Columns().AccessTitle: in.AccessTitle,
 		dao.SysAccess.Columns().AccessUri:   in.AccessUri,
 	})
 	if err != nil {
-		return pojo.AddAccessOutput{}, err
+		return model.AddAccessOutput{}, err
 	}
 	out.AccessId = id
 	service.RegisterAccess(New())
 	return
 }
 
-func (s *sAccess) UpdateAccess(ctx context.Context, in pojo.UpdateAccessInput) (err error) {
+func (s *sAccess) UpdateAccess(ctx context.Context, in model.UpdateAccessInput) (err error) {
 	_, err = dao.SysAccess.Ctx(ctx).OmitEmpty().WherePri(in.AccessId).Data(g.Map{
 		dao.SysAccess.Columns().AccessTitle: in.AccessTitle,
 		dao.SysAccess.Columns().AccessUri:   in.AccessUri,
@@ -78,7 +78,7 @@ func (s *sAccess) UpdateAccess(ctx context.Context, in pojo.UpdateAccessInput) (
 	return
 }
 
-func (s *sAccess) DeleteAccess(ctx context.Context, in pojo.DeleteAccessInput) (err error) {
+func (s *sAccess) DeleteAccess(ctx context.Context, in model.DeleteAccessInput) (err error) {
 	err = dao.SysAccess.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		// 删除sys_access表中的数据
 		_, e := tx.Model(dao.SysAccess.Table()).WherePri(in.AccessId).Delete()
