@@ -106,8 +106,14 @@ type GetGoodsListBySupplierReq struct {
 	SupplierId int64 `json:"supplierId" dc:"供应商ID" v:"required#请输入供应商ID"`
 }
 
+type GoodsSupplierRelation struct {
+	GoodsId     int64   `json:"goodsId"`
+	GoodsName   string  `json:"goodsName"`
+	SupplyPrice float64 `json:"supplyPrice"`
+}
+
 type GetGoodsListBySupplierRes struct {
-	List []entity.Goods `json:"list"`
+	List []GoodsSupplierRelation `json:"list"`
 }
 
 type GetGoodsListReq struct {

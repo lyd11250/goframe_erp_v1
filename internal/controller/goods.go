@@ -125,7 +125,7 @@ func (c *cGoods) GetGoodsListBySupplier(ctx context.Context, req *v1.GetGoodsLis
 	if err != nil {
 		return nil, err
 	}
-	res = &v1.GetGoodsListBySupplierRes{List: output.List}
+	err = gconv.Struct(output, &res)
 	return
 }
 

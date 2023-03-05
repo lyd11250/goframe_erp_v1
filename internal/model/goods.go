@@ -86,8 +86,14 @@ type GetGoodsListBySupplierInput struct {
 	SupplierId int64
 }
 
+type GoodsSupplierRelation struct {
+	GoodsId     int64
+	GoodsName   string
+	SupplyPrice float64
+}
+
 type GetGoodsListBySupplierOutput struct {
-	List []entity.Goods
+	List []GoodsSupplierRelation
 }
 
 type GetGoodsListOutput struct {

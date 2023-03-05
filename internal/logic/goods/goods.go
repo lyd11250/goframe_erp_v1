@@ -139,16 +139,25 @@ func (s *sGoods) CheckGoodsEnabled(ctx context.Context, in model.CheckGoodsEnabl
 
 func (s *sGoods) GetGoodsListBySupplier(ctx context.Context, in model.GetGoodsListBySupplierInput) (out model.GetGoodsListBySupplierOutput, err error) {
 	result, err := dao.GoodsSupplierRel.Ctx(ctx).
-		Fields(dao.GoodsSupplierRel.Columns().GoodsId).
+		Fields(dao.GoodsSupplierRel.Columns().GoodsId, dao.GoodsSupplierRel.Columns().SupplyPrice).
 		All(dao.GoodsSupplierRel.Columns().SupplierId, in.SupplierId)
 	if err != nil {
 		return model.GetGoodsListBySupplierOutput{}, err
 	}
-	resultArray := result.Array()
-	if len(resultArray) == 0 {
-		return out, gerror.NewCode(gcode.CodeNotFound, "该供应商未配置商品")
+	if result.IsEmpty() {
+		return out, gerror.NewCode(gcode.CodeNotFound, "供应商未配置商品")
 	}
-	err = dao.Goods.Ctx(ctx).WhereIn(dao.Goods.Columns().GoodsId, resultArray).Scan(&out.List)
+	err = result.Structs(&out.List)
+	if err != nil {
+		return model.GetGoodsListBySupplierOutput{}, err
+	}
+	for i := range out.List {
+		getGoodsByIdOutput, err := service.Goods().GetGoodsById(ctx, model.GetGoodsByIdInput{GoodsId: out.List[i].GoodsId})
+		if err != nil {
+			return model.GetGoodsListBySupplierOutput{}, err
+		}
+		out.List[i].GoodsName = getGoodsByIdOutput.GoodsName
+	}
 	return
 }
 
