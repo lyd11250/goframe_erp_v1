@@ -18,6 +18,7 @@ func New() *sOrder {
 			consts.OrderTypeXSCK: impl.InventoryOrder,
 			consts.OrderTypeCGRK: impl.InventoryOrder,
 			consts.OrderTypeCGDD: impl.PurchaseOrder,
+			consts.OrderTypeXSDD: impl.SaleOrder,
 		},
 	}
 }
@@ -39,7 +40,17 @@ func (s *sOrder) RegisterType(orderType int, i model.InterfaceOrder) {
 func (s *sOrder) Type(orderType int) (i model.InterfaceOrder) {
 	i = s.Imap[orderType]
 	if i == nil {
-		panic("implement not found for interface InterfaceOrder, forgot register?")
+		panic("订单类型错误")
 	}
 	return i
+}
+
+func (s *sOrder) Prefix(prefix string) (i model.InterfaceOrder) {
+	for k, v := range consts.OrderPrefixMap {
+		if v == prefix {
+			i = s.Imap[k]
+			break
+		}
+	}
+	return
 }

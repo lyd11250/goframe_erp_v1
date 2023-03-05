@@ -20,22 +20,34 @@ type OrderItemDao struct {
 
 // OrderItemColumns defines and stores column names for table order_item.
 type OrderItemColumns struct {
-	OrderNo  string // 单号
-	GoodsId  string // 商品ID
-	Price    string // 单价
-	Amount   string // 订单项总价格
-	Quantity string // 数量
-	Notes    string // 备注
+	OrderItemId      string // 订单项ID
+	OrderNo          string // 单号
+	GoodsId          string // 商品ID
+	GoodsName        string // 商品名称
+	Price            string // 单价
+	Amount           string // 订单项总价格
+	Quantity         string // 数量
+	Notes            string // 备注
+	CompleteTime     string // 完成时间
+	CompleteUser     string // 完成人
+	CompleteUserName string // 完成人姓名
+	Status           string // 订单项状态
 }
 
 // orderItemColumns holds the columns for table order_item.
 var orderItemColumns = OrderItemColumns{
-	OrderNo:  "order_no",
-	GoodsId:  "goods_id",
-	Price:    "price",
-	Amount:   "amount",
-	Quantity: "quantity",
-	Notes:    "notes",
+	OrderItemId:      "order_item_id",
+	OrderNo:          "order_no",
+	GoodsId:          "goods_id",
+	GoodsName:        "goods_name",
+	Price:            "price",
+	Amount:           "amount",
+	Quantity:         "quantity",
+	Notes:            "notes",
+	CompleteTime:     "complete_time",
+	CompleteUser:     "complete_user",
+	CompleteUserName: "complete_user_name",
+	Status:           "status",
 }
 
 // NewOrderItemDao creates and returns a new DAO object for table data access.

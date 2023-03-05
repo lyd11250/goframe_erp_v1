@@ -10,6 +10,10 @@ type InterfaceOrder interface {
 	GetOrderList(ctx context.Context, in GetOrderListInput) (out GetOrderListOutput, err error)
 	CreateOrder(ctx context.Context, in CreateOrderInput) (out CreateOrderOutput, err error)
 	CancelCreateOrder(ctx context.Context, in CancelCreateOrderInput) (err error)
+	InitOrderItem(ctx context.Context, in InitOrderItemInput) (err error)
+	CompleteOrder(ctx context.Context, in CompleteOrderInput) (err error)
+	CompleteOrderItem(ctx context.Context, in CompleteOrderItemInput) (err error)
+	CancelOrder(ctx context.Context, in CancelOrderInput) (err error)
 }
 
 type GetOrderInfoInput struct {
@@ -39,6 +43,7 @@ type CreateOrderInput struct {
 	OrderType *int
 	POrderNo  *string
 	PartyId   *int64
+	Notes     string
 }
 
 type CreateOrderOutput struct {
@@ -47,6 +52,26 @@ type CreateOrderOutput struct {
 }
 
 type CancelCreateOrderInput struct {
-	OrderId *int64
 	OrderNo *string
+}
+
+type InitOrderItemInput struct {
+	OrderNo *string
+	Items   []entity.OrderItem
+}
+
+type CompleteOrderInput struct {
+	OrderNo string
+	Notes   string
+}
+
+type CompleteOrderItemInput struct {
+	OrderNo     string
+	OrderItemId int64
+	Notes       string
+}
+
+type CancelOrderInput struct {
+	OrderNo string
+	Notes   string
 }

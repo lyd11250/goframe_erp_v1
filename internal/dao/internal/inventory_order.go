@@ -20,34 +20,38 @@ type InventoryOrderDao struct {
 
 // InventoryOrderColumns defines and stores column names for table inventory_order.
 type InventoryOrderColumns struct {
-	OrderId       string // 单据ID
-	OrderNo       string // 单号
-	OrderType     string // 单据类型
-	POrderNo      string // 源单据号
-	OrderAmount   string // 出/入库总金额
-	OrderQuantity string // 出/入库总数
-	CreateTime    string // 制单时间
-	CreateUser    string // 制单人
-	CompleteTime  string // 完成时间
-	CompleteUser  string // 操作员
-	Notes         string // 备注
-	OrderStatus   string // 单据状态
+	OrderId          string // 单据ID
+	OrderNo          string // 单号
+	OrderType        string // 单据类型
+	POrderNo         string // 源单据号
+	OrderAmount      string // 出/入库总金额
+	OrderQuantity    string // 出/入库总数
+	CreateTime       string // 制单时间
+	CreateUser       string // 制单人
+	CompleteTime     string // 完成时间
+	CompleteUser     string // 操作员
+	Notes            string // 备注
+	OrderStatus      string // 单据状态
+	CreateUserName   string // 制单人姓名
+	CompleteUserName string // 完成人姓名
 }
 
 // inventoryOrderColumns holds the columns for table inventory_order.
 var inventoryOrderColumns = InventoryOrderColumns{
-	OrderId:       "order_id",
-	OrderNo:       "order_no",
-	OrderType:     "order_type",
-	POrderNo:      "p_order_no",
-	OrderAmount:   "order_amount",
-	OrderQuantity: "order_quantity",
-	CreateTime:    "create_time",
-	CreateUser:    "create_user",
-	CompleteTime:  "complete_time",
-	CompleteUser:  "complete_user",
-	Notes:         "notes",
-	OrderStatus:   "order_status",
+	OrderId:          "order_id",
+	OrderNo:          "order_no",
+	OrderType:        "order_type",
+	POrderNo:         "p_order_no",
+	OrderAmount:      "order_amount",
+	OrderQuantity:    "order_quantity",
+	CreateTime:       "create_time",
+	CreateUser:       "create_user",
+	CompleteTime:     "complete_time",
+	CompleteUser:     "complete_user",
+	Notes:            "notes",
+	OrderStatus:      "order_status",
+	CreateUserName:   "create_user_name",
+	CompleteUserName: "complete_user_name",
 }
 
 // NewInventoryOrderDao creates and returns a new DAO object for table data access.

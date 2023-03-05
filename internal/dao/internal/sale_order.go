@@ -20,34 +20,38 @@ type SaleOrderDao struct {
 
 // SaleOrderColumns defines and stores column names for table sale_order.
 type SaleOrderColumns struct {
-	OrderId       string // 单据ID
-	OrderNo       string // 单号
-	CustomerId    string // 客户ID
-	CustomerName  string // 客户名称
-	OrderQuantity string // 采购数量
-	OrderAmount   string // 采购总金额
-	CreateTime    string // 制单时间
-	CreateUser    string // 制单人
-	CompleteTime  string // 完成时间
-	CompleteUser  string // 操作员
-	Notes         string // 备注
-	OrderStatus   string // 单据状态
+	OrderId          string // 单据ID
+	OrderNo          string // 单号
+	CustomerId       string // 客户ID
+	CustomerName     string // 客户名称
+	OrderQuantity    string // 采购数量
+	OrderAmount      string // 采购总金额
+	CreateTime       string // 制单时间
+	CreateUser       string // 制单人
+	CompleteTime     string // 完成时间
+	CompleteUser     string // 操作员
+	Notes            string // 备注
+	OrderStatus      string // 单据状态
+	CreateUserName   string // 制单人姓名
+	CompleteUserName string // 完成人姓名
 }
 
 // saleOrderColumns holds the columns for table sale_order.
 var saleOrderColumns = SaleOrderColumns{
-	OrderId:       "order_id",
-	OrderNo:       "order_no",
-	CustomerId:    "customer_id",
-	CustomerName:  "customer_name",
-	OrderQuantity: "order_quantity",
-	OrderAmount:   "order_amount",
-	CreateTime:    "create_time",
-	CreateUser:    "create_user",
-	CompleteTime:  "complete_time",
-	CompleteUser:  "complete_user",
-	Notes:         "notes",
-	OrderStatus:   "order_status",
+	OrderId:          "order_id",
+	OrderNo:          "order_no",
+	CustomerId:       "customer_id",
+	CustomerName:     "customer_name",
+	OrderQuantity:    "order_quantity",
+	OrderAmount:      "order_amount",
+	CreateTime:       "create_time",
+	CreateUser:       "create_user",
+	CompleteTime:     "complete_time",
+	CompleteUser:     "complete_user",
+	Notes:            "notes",
+	OrderStatus:      "order_status",
+	CreateUserName:   "create_user_name",
+	CompleteUserName: "complete_user_name",
 }
 
 // NewSaleOrderDao creates and returns a new DAO object for table data access.

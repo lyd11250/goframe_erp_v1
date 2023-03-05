@@ -16,6 +16,7 @@ type (
 		GenerateOrderNo(orderType int, time *gtime.Time) (orderNo string)
 		RegisterType(orderType int, i model.InterfaceOrder)
 		Type(orderType int) (i model.InterfaceOrder)
+		Prefix(prefix string) (i model.InterfaceOrder)
 	}
 )
 

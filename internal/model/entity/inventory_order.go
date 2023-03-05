@@ -10,16 +10,18 @@ import (
 
 // InventoryOrder is the golang structure for table inventory_order.
 type InventoryOrder struct {
-	OrderId       int64       `json:"orderId"       ` // 单据ID
-	OrderNo       string      `json:"orderNo"       ` // 单号
-	OrderType     int         `json:"orderType"     ` // 单据类型
-	POrderNo      string      `json:"pOrderNo"      ` // 源单据号
-	OrderAmount   float64     `json:"orderAmount"   ` // 出/入库总金额
-	OrderQuantity int         `json:"orderQuantity" ` // 出/入库总数
-	CreateTime    *gtime.Time `json:"createTime"    ` // 制单时间
-	CreateUser    int64       `json:"createUser"    ` // 制单人
-	CompleteTime  *gtime.Time `json:"completeTime"  ` // 完成时间
-	CompleteUser  int64       `json:"completeUser"  ` // 操作员
-	Notes         string      `json:"notes"         ` // 备注
-	OrderStatus   int         `json:"orderStatus"   ` // 单据状态
+	OrderId          int64       `json:"orderId"          ` // 单据ID
+	OrderNo          string      `json:"orderNo"          ` // 单号
+	OrderType        int         `json:"orderType"        ` // 单据类型
+	POrderNo         string      `json:"pOrderNo"         ` // 源单据号
+	OrderAmount      float64     `json:"orderAmount"      ` // 出/入库总金额
+	OrderQuantity    int         `json:"orderQuantity"    ` // 出/入库总数
+	CreateTime       *gtime.Time `json:"createTime"       ` // 制单时间
+	CreateUser       int64       `json:"createUser"       ` // 制单人
+	CompleteTime     *gtime.Time `json:"completeTime"     ` // 完成时间
+	CompleteUser     int64       `json:"completeUser"     ` // 操作员
+	Notes            string      `json:"notes"            ` // 备注
+	OrderStatus      int         `json:"orderStatus"      ` // 单据状态
+	CreateUserName   string      `json:"createUserName"   ` // 制单人姓名
+	CompleteUserName string      `json:"completeUserName" ` // 完成人姓名
 }

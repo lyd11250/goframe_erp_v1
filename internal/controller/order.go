@@ -19,7 +19,14 @@ func (c *cOrder) GetOrderInfo(ctx context.Context, req *v1.GetOrderInfoReq) (res
 	if err != nil {
 		return nil, err
 	}
-	output, err := service.Order().Type(*req.OrderType).GetOrderInfo(ctx, input)
+	var output model.GetOrderInfoOutput
+	if input.OrderNo == nil {
+		output, err = service.Order().Type(*req.OrderType).GetOrderInfo(ctx, input)
+	} else {
+		prefix := *req.OrderNo
+		prefix = prefix[:4]
+		output, err = service.Order().Prefix(prefix).GetOrderInfo(ctx, input)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -61,6 +68,52 @@ func (c *cOrder) CancelCreateOrder(ctx context.Context, req *v1.CancelCreateOrde
 	if err != nil {
 		return nil, err
 	}
-	err = service.Order().Type(*req.OrderType).CancelCreateOrder(ctx, input)
+	prefix := *req.OrderNo
+	prefix = prefix[:4]
+	err = service.Order().Prefix(prefix).CancelCreateOrder(ctx, input)
+	return
+}
+
+func (c *cOrder) InitOrderItem(ctx context.Context, req *v1.InitOrderItemReq) (res *v1.InitOrderItemRes, err error) {
+	var input model.InitOrderItemInput
+	err = gconv.Struct(req, &input)
+	if err != nil {
+		return nil, err
+	}
+	prefix := req.OrderNo[:4]
+	err = service.Order().Prefix(prefix).InitOrderItem(ctx, input)
+	return
+}
+
+func (c *cOrder) CompleteOrder(ctx context.Context, req *v1.CompleteOrderReq) (res *v1.CompleteOrderRes, err error) {
+	var input model.CompleteOrderInput
+	err = gconv.Struct(req, &input)
+	if err != nil {
+		return nil, err
+	}
+	prefix := req.OrderNo[:4]
+	err = service.Order().Prefix(prefix).CompleteOrder(ctx, input)
+	return
+}
+
+func (c *cOrder) CompleteOrderItem(ctx context.Context, req *v1.CompleteOrderItemReq) (res *v1.CompleteOrderItemRes, err error) {
+	var input model.CompleteOrderItemInput
+	err = gconv.Struct(req, &input)
+	if err != nil {
+		return nil, err
+	}
+	prefix := req.OrderNo[:4]
+	err = service.Order().Prefix(prefix).CompleteOrderItem(ctx, input)
+	return
+}
+
+func (c *cOrder) CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrderRes, err error) {
+	var input model.CancelOrderInput
+	err = gconv.Struct(req, &input)
+	if err != nil {
+		return nil, err
+	}
+	prefix := req.OrderNo[:4]
+	err = service.Order().Prefix(prefix).CancelOrder(ctx, input)
 	return
 }

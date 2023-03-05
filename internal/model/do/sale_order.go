@@ -11,17 +11,19 @@ import (
 
 // SaleOrder is the golang structure of table sale_order for DAO operations like Where/Data.
 type SaleOrder struct {
-	g.Meta        `orm:"table:sale_order, do:true"`
-	OrderId       interface{} // 单据ID
-	OrderNo       interface{} // 单号
-	CustomerId    interface{} // 客户ID
-	CustomerName  interface{} // 客户名称
-	OrderQuantity interface{} // 采购数量
-	OrderAmount   interface{} // 采购总金额
-	CreateTime    *gtime.Time // 制单时间
-	CreateUser    interface{} // 制单人
-	CompleteTime  *gtime.Time // 完成时间
-	CompleteUser  interface{} // 操作员
-	Notes         interface{} // 备注
-	OrderStatus   interface{} // 单据状态
+	g.Meta           `orm:"table:sale_order, do:true"`
+	OrderId          interface{} // 单据ID
+	OrderNo          interface{} // 单号
+	CustomerId       interface{} // 客户ID
+	CustomerName     interface{} // 客户名称
+	OrderQuantity    interface{} // 采购数量
+	OrderAmount      interface{} // 采购总金额
+	CreateTime       *gtime.Time // 制单时间
+	CreateUser       interface{} // 制单人
+	CompleteTime     *gtime.Time // 完成时间
+	CompleteUser     interface{} // 操作员
+	Notes            interface{} // 备注
+	OrderStatus      interface{} // 单据状态
+	CreateUserName   interface{} // 制单人姓名
+	CompleteUserName interface{} // 完成人姓名
 }

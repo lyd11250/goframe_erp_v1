@@ -7,7 +7,7 @@ import (
 
 type GetOrderInfoReq struct {
 	g.Meta    `method:"post" path:"/order/info" summary:"获取订单信息" tags:"订单管理"`
-	OrderType *int    `json:"orderType" v:"required#订单类型不能为空"`
+	OrderType *int    `json:"orderType" v:"required-with:orderId#订单类型不能为空"`
 	OrderId   *int64  `json:"orderId" v:"required-without:orderNo#请输入单据ID或单号"`
 	OrderNo   *string `json:"orderNo" v:"required-without:orderId#请输入单据ID或单号"`
 }
@@ -33,8 +33,9 @@ type GetOrderListRes struct {
 type CreateOrderReq struct {
 	g.Meta    `method:"post" path:"/order/create" summary:"创建订单" tags:"订单管理"`
 	OrderType *int    `json:"orderType" v:"required#订单类型不能为空"`
-	POrderNo  *string `json:"pOrderNo" v:"required-without:partyId#源订单号不能为空"`
-	PartyId   *int64  `json:"partyId" v:"required-without:pOrderId#供应商/客户ID不能为空"`
+	POrderNo  *string `json:"pOrderNo" v:"required-if:orderType,1,orderType,3#源订单号不能为空"`
+	PartyId   *int64  `json:"partyId" v:"required-if:orderType,0,orderType,2#供应商/客户ID不能为空"`
+	Notes     string  `json:"notes"`
 }
 
 type CreateOrderRes struct {
@@ -43,11 +44,46 @@ type CreateOrderRes struct {
 }
 
 type CancelCreateOrderReq struct {
-	g.Meta    `method:"post" path:"/order/create/cancel" summary:"取消创建订单" tags:"订单管理"`
-	OrderType *int    `json:"orderType" v:"required#订单类型不能为空"`
-	OrderId   *int64  `json:"orderId" v:"required-without:orderNo#请输入单据ID或单号"`
-	OrderNo   *string `json:"orderNo" v:"required-without:orderId#请输入单据ID或单号"`
+	g.Meta  `method:"post" path:"/order/create/cancel" summary:"取消创建订单" tags:"订单管理"`
+	OrderNo *string `json:"orderNo" v:"required-without:orderId#请输入单号"`
 }
 
 type CancelCreateOrderRes struct {
+}
+
+type InitOrderItemReq struct {
+	g.Meta  `method:"post" path:"/order/item/init" summary:"初始化订单明细" tags:"订单管理"`
+	OrderNo string             `json:"orderNo" v:"required#请输入单号"`
+	Items   []entity.OrderItem `json:"items" v:"required#请输入明细"`
+}
+
+type InitOrderItemRes struct {
+}
+
+type CompleteOrderReq struct {
+	g.Meta  `method:"post" path:"/order/complete" summary:"完成订单" tags:"订单管理"`
+	OrderNo string `json:"orderNo" v:"required#请输入单号"`
+	Notes   string `json:"notes"`
+}
+
+type CompleteOrderRes struct {
+}
+
+type CompleteOrderItemReq struct {
+	g.Meta      `method:"post" path:"/order/item/complete" summary:"完成订单项" tags:"订单管理"`
+	OrderNo     string `json:"orderNo" v:"required#请输入单号"`
+	OrderItemId int64  `json:"orderItemId" v:"required#请输入订单项ID"`
+	Notes       string `json:"notes"`
+}
+
+type CompleteOrderItemRes struct {
+}
+
+type CancelOrderReq struct {
+	g.Meta  `method:"post" path:"/order/cancel" summary:"取消订单" tags:"订单管理"`
+	OrderNo string `json:"orderNo" v:"required#请输入单号"`
+	Notes   string `json:"notes"`
+}
+
+type CancelOrderRes struct {
 }

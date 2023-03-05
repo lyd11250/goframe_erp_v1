@@ -6,15 +6,22 @@ package do
 
 import (
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
 )
 
 // OrderItem is the golang structure of table order_item for DAO operations like Where/Data.
 type OrderItem struct {
-	g.Meta   `orm:"table:order_item, do:true"`
-	OrderNo  interface{} // 单号
-	GoodsId  interface{} // 商品ID
-	Price    interface{} // 单价
-	Amount   interface{} // 订单项总价格
-	Quantity interface{} // 数量
-	Notes    interface{} // 备注
+	g.Meta           `orm:"table:order_item, do:true"`
+	OrderItemId      interface{} // 订单项ID
+	OrderNo          interface{} // 单号
+	GoodsId          interface{} // 商品ID
+	GoodsName        interface{} // 商品名称
+	Price            interface{} // 单价
+	Amount           interface{} // 订单项总价格
+	Quantity         interface{} // 数量
+	Notes            interface{} // 备注
+	CompleteTime     *gtime.Time // 完成时间
+	CompleteUser     interface{} // 完成人
+	CompleteUserName interface{} // 完成人姓名
+	Status           interface{} // 订单项状态
 }

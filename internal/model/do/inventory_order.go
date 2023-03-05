@@ -11,17 +11,19 @@ import (
 
 // InventoryOrder is the golang structure of table inventory_order for DAO operations like Where/Data.
 type InventoryOrder struct {
-	g.Meta        `orm:"table:inventory_order, do:true"`
-	OrderId       interface{} // 单据ID
-	OrderNo       interface{} // 单号
-	OrderType     interface{} // 单据类型
-	POrderNo      interface{} // 源单据号
-	OrderAmount   interface{} // 出/入库总金额
-	OrderQuantity interface{} // 出/入库总数
-	CreateTime    *gtime.Time // 制单时间
-	CreateUser    interface{} // 制单人
-	CompleteTime  *gtime.Time // 完成时间
-	CompleteUser  interface{} // 操作员
-	Notes         interface{} // 备注
-	OrderStatus   interface{} // 单据状态
+	g.Meta           `orm:"table:inventory_order, do:true"`
+	OrderId          interface{} // 单据ID
+	OrderNo          interface{} // 单号
+	OrderType        interface{} // 单据类型
+	POrderNo         interface{} // 源单据号
+	OrderAmount      interface{} // 出/入库总金额
+	OrderQuantity    interface{} // 出/入库总数
+	CreateTime       *gtime.Time // 制单时间
+	CreateUser       interface{} // 制单人
+	CompleteTime     *gtime.Time // 完成时间
+	CompleteUser     interface{} // 操作员
+	Notes            interface{} // 备注
+	OrderStatus      interface{} // 单据状态
+	CreateUserName   interface{} // 制单人姓名
+	CompleteUserName interface{} // 完成人姓名
 }
