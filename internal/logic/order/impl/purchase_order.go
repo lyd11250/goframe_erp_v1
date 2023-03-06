@@ -244,6 +244,9 @@ func (s *sPurchaseOrder) CreateOrder(ctx context.Context, in model.CreateOrderIn
 	if err != nil {
 		return model.CreateOrderOutput{}, err
 	}
+	if supplierResult.SupplierStatus != consts.StatusEnabled {
+		return out, gerror.NewCode(gcode.CodeInvalidParameter, "供应商不可用")
+	}
 	// 初始化采购单信息
 	userInfo, err := service.User().GetUserById(ctx, model.GetUserByIdInput{UserId: redis.Ctx(ctx).CheckLogin()})
 	if err != nil {
@@ -319,6 +322,15 @@ func (s *sPurchaseOrder) CancelOrder(ctx context.Context, in model.CancelOrderIn
 			dao.PurchaseOrder.Columns().OrderStatus: consts.OrderStatusCancel,
 			dao.PurchaseOrder.Columns().Notes:       in.Notes,
 		}).
+		Update()
+	if err != nil {
+		return err
+	}
+
+	// 更新订单项状态
+	_, err = dao.OrderItem.Ctx(ctx).
+		Where(dao.OrderItem.Columns().OrderNo, in.OrderNo).
+		Data(dao.OrderItem.Columns().Status, consts.OrderStatusCancel).
 		Update()
 	return
 }

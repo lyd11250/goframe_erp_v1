@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 	"goframe-erp-v1/internal/consts"
@@ -13,6 +14,8 @@ import (
 	"goframe-erp-v1/internal/service"
 	"goframe-erp-v1/utility/redis"
 )
+
+var SaleOrder *sSaleOrder
 
 type sSaleOrder struct{}
 
@@ -36,7 +39,7 @@ func (s *sSaleOrder) InitOrderItem(ctx context.Context, in model.InitOrderItemIn
 	}
 
 	// 检查每个订单项
-	for _, orderItem := range in.Items {
+	for i, orderItem := range in.Items {
 		// 检查商品
 		checkGoodsEnabledOutput, err := service.Goods().CheckGoodsEnabled(ctx, model.CheckGoodsEnabledInput{GoodsId: orderItem.GoodsId})
 		if err != nil {
@@ -46,38 +49,133 @@ func (s *sSaleOrder) InitOrderItem(ctx context.Context, in model.InitOrderItemIn
 			return gerror.NewCodef(gcode.CodeInvalidParameter, "商品(%v)不可用", orderItem.GoodsName)
 		}
 
-		// 检查库存
-		getGoodsInventoryOutput, err := service.Inventory().GetGoodsInventory(ctx, model.GetGoodsInventoryInput{GoodsId: orderItem.GoodsId})
+		in.Items[i].Status = consts.OrderStatusProcessing
+		saleOrder.OrderQuantity += orderItem.Quantity
+		saleOrder.OrderAmount += orderItem.Amount
+
+		// 插入订单项
+		_, err = dao.OrderItem.Ctx(ctx).OmitEmpty().Insert(in.Items[i])
 		if err != nil {
 			return err
 		}
-		if getGoodsInventoryOutput.Quantity < orderItem.Quantity {
-			return gerror.NewCodef(gcode.CodeInvalidParameter, "商品(%v)库存不足", orderItem.GoodsName)
-		}
-
-		saleOrder.OrderQuantity += orderItem.Quantity
-		saleOrder.OrderAmount += orderItem.Amount
 	}
 
 	saleOrder.OrderStatus = consts.OrderStatusProcessing
 
-	// 插入订单项
-	_, err = dao.OrderItem.Ctx(ctx).Insert(in.Items)
 	// 更新订单信息
 	_, err = dao.SaleOrder.Ctx(ctx).OmitEmpty().Where(dao.SaleOrder.Columns().OrderNo, in.OrderNo).Update(saleOrder)
 	return
 }
 
-var SaleOrder *sSaleOrder
-
 func (s *sSaleOrder) CompleteOrder(ctx context.Context, in model.CompleteOrderInput) (err error) {
-	//TODO implement me
-	panic("implement me")
+	// 获取订单信息
+	orderInfoOutput, err := s.GetOrderInfo(ctx, model.GetOrderInfoInput{OrderNo: &in.OrderNo})
+	if err != nil {
+		return err
+	}
+	var saleOrder entity.SaleOrder
+	var orderItems = orderInfoOutput.Items
+	err = gconv.Struct(orderInfoOutput.Order, &saleOrder)
+	if err != nil {
+		return err
+	}
+
+	// 检查订单状态
+	if saleOrder.OrderStatus != consts.OrderStatusProcessing {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "订单状态不正确")
+	}
+
+	// 完成所有订单项
+	for _, item := range orderItems {
+		if item.Status == consts.OrderStatusProcessing {
+			err = s.CompleteOrderItem(ctx, model.CompleteOrderItemInput{
+				OrderNo:     in.OrderNo,
+				OrderItemId: item.OrderItemId,
+				Notes:       item.Notes,
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// 更新订单备注
+	_, err = dao.SaleOrder.Ctx(ctx).
+		Where(dao.SaleOrder.Columns().OrderNo, in.OrderNo).
+		Data(dao.SaleOrder.Columns().Notes, in.Notes).
+		Update()
+	return
 }
 
 func (s *sSaleOrder) CompleteOrderItem(ctx context.Context, in model.CompleteOrderItemInput) (err error) {
-	//TODO implement me
-	panic("implement me")
+	// 获取用户信息
+	userInfo, err := service.User().GetUserById(ctx, model.GetUserByIdInput{UserId: redis.Ctx(ctx).CheckLogin()})
+	if err != nil {
+		return err
+	}
+	// 获取订单信息
+	orderInfoOutput, err := s.GetOrderInfo(ctx, model.GetOrderInfoInput{OrderNo: &in.OrderNo})
+	if err != nil {
+		return err
+	}
+	var saleOrder entity.SaleOrder
+	var orderItems = orderInfoOutput.Items
+	err = gconv.Struct(orderInfoOutput.Order, &saleOrder)
+	if err != nil {
+		return err
+	}
+
+	// 检查订单状态
+	if saleOrder.OrderStatus != consts.OrderStatusProcessing {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "订单状态不正确")
+	}
+
+	// 检查订单项是否存在
+	var orderItem entity.OrderItem
+	var completedItemNum = 0
+	for _, item := range orderItems {
+		if item.OrderItemId == in.OrderItemId {
+			orderItem = item
+			break
+		}
+		if item.Status == consts.OrderStatusDone {
+			completedItemNum++
+		}
+	}
+	if orderItem.OrderItemId == 0 {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "订单项不存在")
+	}
+
+	// 检查订单项状态
+	if orderItem.Status != consts.OrderStatusProcessing {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "订单项状态不正确")
+	}
+
+	// 完成订单项
+	currentTime := gtime.Now()
+	orderItem.Status = consts.OrderStatusDone
+	orderItem.CompleteTime = currentTime
+	orderItem.CompleteUser = userInfo.UserId
+	orderItem.CompleteUserName = userInfo.UserRealName
+	orderItem.Notes = in.Notes
+	_, err = dao.OrderItem.Ctx(ctx).
+		Where(dao.OrderItem.Columns().OrderItemId, in.OrderItemId).
+		Update(orderItem)
+	if err != nil {
+		return err
+	}
+
+	// 若订单的所有订单项全部完成，更新订单信息
+	if completedItemNum == len(orderItems)-1 {
+		saleOrder.CompleteTime = currentTime
+		saleOrder.CompleteUser = userInfo.UserId
+		saleOrder.CompleteUserName = userInfo.UserRealName
+		saleOrder.OrderStatus = consts.OrderStatusDone
+		_, err = dao.SaleOrder.Ctx(ctx).
+			Where(dao.SaleOrder.Columns().OrderNo, in.OrderNo).
+			Update(saleOrder)
+	}
+	return
 }
 
 func (s *sSaleOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInfoInput) (out model.GetOrderInfoOutput, err error) {
@@ -98,7 +196,7 @@ func (s *sSaleOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInfoInpu
 	}
 	out.Order = gconv.MapDeep(order)
 	err = dao.OrderItem.Ctx(ctx).
-		Where(dao.OrderItem.Columns().OrderNo, out.Order[dao.SaleOrder.Columns().OrderNo]).
+		Where(dao.OrderItem.Columns().OrderNo, order.OrderNo).
 		Scan(&out.Items)
 	return
 }
@@ -106,6 +204,7 @@ func (s *sSaleOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInfoInpu
 func (s *sSaleOrder) GetOrderList(ctx context.Context, in model.GetOrderListInput) (out model.GetOrderListOutput, err error) {
 	var orderList []entity.SaleOrder
 	err = dao.SaleOrder.Ctx(ctx).
+		OrderDesc(dao.SaleOrder.Columns().CreateTime).
 		Page(in.Page, in.PageSize).
 		Scan(&orderList)
 	if err != nil {
@@ -135,6 +234,9 @@ func (s *sSaleOrder) CreateOrder(ctx context.Context, in model.CreateOrderInput)
 	customerResult, err := service.Customer().GetCustomerById(ctx, model.GetCustomerByIdInput{CustomerId: *in.PartyId})
 	if err != nil {
 		return model.CreateOrderOutput{}, err
+	}
+	if customerResult.CustomerStatus != consts.StatusEnabled {
+		return out, gerror.NewCode(gcode.CodeInvalidParameter, "客户不可用")
 	}
 	// 初始化销售单信息
 	userInfo, err := service.User().GetUserById(ctx, model.GetUserByIdInput{UserId: redis.Ctx(ctx).CheckLogin()})
@@ -188,5 +290,22 @@ func (s *sSaleOrder) CancelCreateOrder(ctx context.Context, in model.CancelCreat
 	return
 }
 func (s *sSaleOrder) CancelOrder(ctx context.Context, in model.CancelOrderInput) (err error) {
+	// 获取订单信息
+	orderInfo, err := s.GetOrderInfo(ctx, model.GetOrderInfoInput{OrderNo: &in.OrderNo})
+	if err != nil {
+		return err
+	}
+	// 订单状态不是处理中
+	if orderInfo.Order["orderStatus"] != consts.OrderStatusProcessing {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "订单状态错误，无法取消")
+	}
+	// 更新订单
+	_, err = dao.SaleOrder.Ctx(ctx).
+		Where(dao.SaleOrder.Columns().OrderNo, in.OrderNo).
+		Data(g.Map{
+			dao.SaleOrder.Columns().OrderStatus: consts.OrderStatusCancel,
+			dao.SaleOrder.Columns().Notes:       in.Notes,
+		}).
+		Update()
 	return
 }
