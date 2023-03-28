@@ -15,107 +15,116 @@ import (
 	"goframe-erp-v1/utility/redis"
 )
 
-type sInventoryOrder struct{}
+type sReturnOrder struct{}
 
-var InventoryOrder *sInventoryOrder
+var ReturnOrder *sReturnOrder
 
-func (s *sInventoryOrder) InitOrderItem(ctx context.Context, in model.InitOrderItemInput) (err error) {
+func (s *sReturnOrder) InitOrderItem(ctx context.Context, in model.InitOrderItemInput) (err error) {
+	// 获取订单信息
 	orderInfoOutput, err := s.GetOrderInfo(ctx, model.GetOrderInfoInput{OrderNo: in.OrderNo})
 	if err != nil {
 		return err
 	}
-	var inventoryOrder entity.InventoryOrder
-	err = gconv.Struct(orderInfoOutput.Order, &inventoryOrder)
+	var returnOrder entity.ReturnOrder
+	err = gconv.Struct(orderInfoOutput.Order, &returnOrder)
 	if err != nil {
 		return err
 	}
 
+	// 获取源订单信息
+	pOrderInfo, err := service.Order().Prefix(returnOrder.POrderNo[:4]).
+		GetOrderInfo(ctx, model.GetOrderInfoInput{OrderNo: &returnOrder.POrderNo})
+	if err != nil {
+		return err
+	}
+	if pOrderInfo.Order["orderStatus"] != consts.OrderStatusDone {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "源订单未完成，无法退货")
+	}
+
+	// 商品退货数量
 	goodsQuantityMap := make(map[int64]int)
 	for _, orderItem := range in.Items {
 		goodsQuantityMap[orderItem.GoodsId] += orderItem.Quantity
 	}
 
-	for i, orderItem := range in.Items {
+	for goodsId, quantity := range goodsQuantityMap {
 		// 检查商品
-		checkGoodsEnabledOutput, err := service.Goods().CheckGoodsEnabled(ctx, model.CheckGoodsEnabledInput{GoodsId: orderItem.GoodsId})
+		enabled, err := service.Goods().CheckGoodsEnabled(ctx, model.CheckGoodsEnabledInput{GoodsId: goodsId})
 		if err != nil {
 			return err
 		}
-		if !checkGoodsEnabledOutput.Enabled {
-			return gerror.NewCodef(gcode.CodeInvalidParameter, "商品(%v)不可用", orderItem.GoodsName)
+		if !enabled.Enabled {
+			return gerror.NewCode(gcode.CodeInvalidParameter, "商品不可用")
 		}
 
-		// 源订单号
-		pOrderNo := orderInfoOutput.Order["pOrderNo"]
+		// 检查商品采购/销售数量
+		var pOrderQuantity int
+		for _, pOrderItem := range pOrderInfo.Items {
+			if pOrderItem.GoodsId == goodsId {
+				pOrderQuantity += pOrderItem.Quantity
+			}
+		}
+		if pOrderQuantity < quantity {
+			return gerror.NewCode(gcode.CodeInvalidParameter, "商品退货数量大于源订单数量")
+		}
 
-		// 与源订单关联的已完成的出/入库单单号
-		result, err := dao.InventoryOrder.Ctx(ctx).
-			Fields(dao.InventoryOrder.Columns().OrderNo).
-			All(g.Map{
-				dao.InventoryOrder.Columns().POrderNo:    pOrderNo,
-				dao.InventoryOrder.Columns().OrderStatus: consts.OrderStatusDone,
-			})
+		// 检查已退货数量
+		var returnQuantity float64
+		// 与源订单关联的、已完成的退货订单
+		relReturnOrderNoResult, err := dao.ReturnOrder.Ctx(ctx).
+			Fields(dao.ReturnOrder.Columns().OrderNo).
+			Where(dao.ReturnOrder.Columns().POrderNo, returnOrder.POrderNo).
+			Where(dao.ReturnOrder.Columns().OrderStatus, consts.OrderStatusDone).
+			All()
 		if err != nil {
 			return err
 		}
-		var relInventoryOrderNoList = result.Array()
-
-		// 已完成的出/入库单数量
-		doneSum, err := dao.OrderItem.Ctx(ctx).
-			WhereIn(dao.OrderItem.Columns().OrderNo, relInventoryOrderNoList).
-			Where(dao.OrderItem.Columns().Status, consts.OrderStatusDone).
+		returnQuantity, err = dao.OrderItem.Ctx(ctx).
+			WhereIn(dao.OrderItem.Columns().OrderNo, relReturnOrderNoResult.Array("order_no")).
+			Where(dao.OrderItem.Columns().GoodsId, goodsId).
 			Sum(dao.OrderItem.Columns().Quantity)
 		if err != nil {
 			return err
 		}
+		if pOrderQuantity < quantity+int(returnQuantity) {
+			return gerror.NewCode(gcode.CodeInvalidParameter, "商品退货数量大于源订单数量")
+		}
+	}
 
-		// 源订单采购/销售数量
-		pOrderSum, err := dao.OrderItem.Ctx(ctx).
-			Where(g.Map{
-				dao.OrderItem.Columns().OrderNo: pOrderNo,
-				dao.OrderItem.Columns().GoodsId: orderItem.GoodsId,
-			}).Sum(dao.OrderItem.Columns().Quantity)
+	for i := range in.Items {
+		in.Items[i].Status = consts.OrderStatusProcessing
+		returnOrder.OrderQuantity += in.Items[i].Quantity
+		returnOrder.OrderAmount += in.Items[i].Amount
+
+		// 插入订单项
+		_, err = dao.OrderItem.Ctx(ctx).OmitEmpty().Insert(in.Items[i])
 		if err != nil {
 			return err
 		}
-
-		if pOrderSum == 0 {
-			return gerror.NewCodef(gcode.CodeInvalidParameter, "商品(%v)未在源订单中", orderItem.GoodsName)
-		}
-
-		if pOrderSum-doneSum < float64(goodsQuantityMap[orderItem.GoodsId]) {
-			return gerror.NewCodef(gcode.CodeInvalidParameter, "商品(%v)出/入库超量", orderItem.GoodsName)
-		}
-
-		in.Items[i].Status = consts.OrderStatusProcessing
-		inventoryOrder.OrderQuantity += orderItem.Quantity
-		inventoryOrder.OrderAmount += orderItem.Amount
 	}
 
-	inventoryOrder.OrderStatus = consts.OrderStatusProcessing
+	returnOrder.OrderStatus = consts.OrderStatusProcessing
 
-	// 插入订单项
-	_, err = dao.OrderItem.Ctx(ctx).Insert(in.Items)
 	// 更新订单信息
-	_, err = dao.InventoryOrder.Ctx(ctx).OmitEmpty().Where(dao.InventoryOrder.Columns().OrderNo, in.OrderNo).Update(inventoryOrder)
+	_, err = dao.ReturnOrder.Ctx(ctx).OmitEmpty().Where(dao.PurchaseOrder.Columns().OrderNo, in.OrderNo).Update(returnOrder)
 	return
 }
 
-func (s *sInventoryOrder) CompleteOrder(ctx context.Context, in model.CompleteOrderInput) (err error) {
+func (s *sReturnOrder) CompleteOrder(ctx context.Context, in model.CompleteOrderInput) (err error) {
 	// 获取订单信息
 	orderInfoOutput, err := s.GetOrderInfo(ctx, model.GetOrderInfoInput{OrderNo: &in.OrderNo})
 	if err != nil {
 		return err
 	}
-	var inventoryOrder entity.InventoryOrder
+	var returnOrder entity.ReturnOrder
 	var orderItems = orderInfoOutput.Items
-	err = gconv.Struct(orderInfoOutput.Order, &inventoryOrder)
+	err = gconv.Struct(orderInfoOutput.Order, &returnOrder)
 	if err != nil {
 		return err
 	}
 
 	// 检查订单状态
-	if inventoryOrder.OrderStatus != consts.OrderStatusProcessing {
+	if returnOrder.OrderStatus != consts.OrderStatusProcessing {
 		return gerror.NewCode(gcode.CodeInvalidParameter, "订单状态不正确")
 	}
 
@@ -141,7 +150,7 @@ func (s *sInventoryOrder) CompleteOrder(ctx context.Context, in model.CompleteOr
 	return
 }
 
-func (s *sInventoryOrder) CompleteOrderItem(ctx context.Context, in model.CompleteOrderItemInput) (err error) {
+func (s *sReturnOrder) CompleteOrderItem(ctx context.Context, in model.CompleteOrderItemInput) (err error) {
 	// 获取用户信息
 	userInfo, err := service.User().GetUserById(ctx, model.GetUserByIdInput{UserId: redis.Ctx(ctx).CheckLogin()})
 	if err != nil {
@@ -152,41 +161,16 @@ func (s *sInventoryOrder) CompleteOrderItem(ctx context.Context, in model.Comple
 	if err != nil {
 		return err
 	}
-	var inventoryOrder entity.InventoryOrder
+	var returnOrder entity.ReturnOrder
 	var orderItems = orderInfoOutput.Items
-	err = gconv.Struct(orderInfoOutput.Order, &inventoryOrder)
+	err = gconv.Struct(orderInfoOutput.Order, &returnOrder)
 	if err != nil {
 		return err
 	}
 
 	// 检查订单状态
-	if inventoryOrder.OrderStatus != consts.OrderStatusProcessing {
+	if returnOrder.OrderStatus != consts.OrderStatusProcessing {
 		return gerror.NewCode(gcode.CodeInvalidParameter, "订单状态不正确")
-	}
-
-	// 源订单信息
-	prefix := inventoryOrder.POrderNo[:4]
-	pOrderInfo, err := service.Order().Prefix(prefix).GetOrderInfo(ctx, model.GetOrderInfoInput{OrderNo: &inventoryOrder.POrderNo})
-	if err != nil {
-		return err
-	}
-	// 获取源订单关联的已完成的出入库订单号
-	result, err := dao.InventoryOrder.Ctx(ctx).
-		Where(dao.InventoryOrder.Columns().POrderNo, inventoryOrder.POrderNo).
-		Where(dao.InventoryOrder.Columns().OrderStatus, consts.OrderStatusDone).
-		Fields(dao.InventoryOrder.Columns().OrderNo).
-		All()
-	if err != nil {
-		return err
-	}
-	relOrderNoArray := result.Array()
-	// 获取已完成订单项的出入库总数
-	doneSum, err := dao.OrderItem.Ctx(ctx).
-		WhereIn(dao.OrderItem.Columns().OrderNo, relOrderNoArray).
-		Where(dao.OrderItem.Columns().Status, consts.OrderStatusDone).
-		Sum(dao.OrderItem.Columns().Quantity)
-	if err != nil {
-		return err
 	}
 
 	// 检查订单项是否存在
@@ -210,36 +194,6 @@ func (s *sInventoryOrder) CompleteOrderItem(ctx context.Context, in model.Comple
 		return gerror.NewCode(gcode.CodeInvalidParameter, "订单项状态不正确")
 	}
 
-	// 检查出入库数量
-	for _, pOrderItem := range pOrderInfo.Items {
-		if pOrderItem.GoodsId == orderItem.GoodsId {
-			if orderItem.Quantity+int(doneSum) > pOrderItem.Quantity {
-				return gerror.NewCodef(gcode.CodeInvalidParameter, "商品(%v)出入库超量", orderItem.GoodsName)
-			}
-		}
-	}
-
-	// 商品出入库
-	var inventory entity.Inventory
-	err = gconv.Struct(orderItem, &inventory)
-	if err != nil {
-		return err
-	}
-	switch inventoryOrder.OrderType {
-	case consts.OrderTypeCGRK:
-		_, err = service.Inventory().AddInventory(ctx, model.AddInventoryInput{
-			Inventory: inventory,
-		})
-	case consts.OrderTypeXSCK:
-		_, err = service.Inventory().ReduceInventory(ctx, model.ReduceInventoryInput{
-			GoodsId:  orderItem.GoodsId,
-			Quantity: orderItem.Quantity,
-		})
-	}
-	if err != nil {
-		return err
-	}
-
 	// 完成订单项
 	currentTime := gtime.Now()
 	orderItem.Status = consts.OrderStatusDone
@@ -256,20 +210,20 @@ func (s *sInventoryOrder) CompleteOrderItem(ctx context.Context, in model.Comple
 
 	// 若订单的所有订单项全部完成，更新订单信息
 	if completedItemNum == len(orderItems)-1 {
-		inventoryOrder.CompleteTime = currentTime
-		inventoryOrder.CompleteUser = userInfo.UserId
-		inventoryOrder.CompleteUserName = userInfo.UserRealName
-		inventoryOrder.OrderStatus = consts.OrderStatusDone
-		_, err = dao.InventoryOrder.Ctx(ctx).
-			Where(dao.InventoryOrder.Columns().OrderNo, in.OrderNo).
-			Update(inventoryOrder)
+		returnOrder.CompleteTime = currentTime
+		returnOrder.CompleteUser = userInfo.UserId
+		returnOrder.CompleteUserName = userInfo.UserRealName
+		returnOrder.OrderStatus = consts.OrderStatusDone
+		_, err = dao.ReturnOrder.Ctx(ctx).
+			Where(dao.ReturnOrder.Columns().OrderNo, in.OrderNo).
+			Update(returnOrder)
 	}
 	return
 }
 
-func (s *sInventoryOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInfoInput) (out model.GetOrderInfoOutput, err error) {
+func (s *sReturnOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInfoInput) (out model.GetOrderInfoOutput, err error) {
 	// 获取订单信息
-	result, err := dao.InventoryOrder.Ctx(ctx).OmitNil().One(in)
+	result, err := dao.ReturnOrder.Ctx(ctx).OmitNil().One(in)
 	if err != nil {
 		return model.GetOrderInfoOutput{}, err
 	}
@@ -280,7 +234,7 @@ func (s *sInventoryOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInf
 	}
 
 	// 订单存在，获取订单明细
-	var order entity.InventoryOrder
+	var order entity.ReturnOrder
 	err = result.Struct(&order)
 	if err != nil {
 		return model.GetOrderInfoOutput{}, err
@@ -293,16 +247,18 @@ func (s *sInventoryOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInf
 		return model.GetOrderInfoOutput{}, err
 	}
 
+	// 已完成退货出/入库数量
+
 	return
 }
 
-func (s *sInventoryOrder) GetOrderList(ctx context.Context, in model.GetOrderListInput) (out model.GetOrderListOutput, err error) {
-	var orderList []entity.InventoryOrder
-	err = dao.InventoryOrder.Ctx(ctx).
+func (s *sReturnOrder) GetOrderList(ctx context.Context, in model.GetOrderListInput) (out model.GetOrderListOutput, err error) {
+	var orderList []entity.ReturnOrder
+	err = dao.ReturnOrder.Ctx(ctx).
 		OmitEmpty().
-		Where(dao.InventoryOrder.Columns().OrderStatus, in.OrderStatus).
-		Where(dao.InventoryOrder.Columns().OrderType, in.OrderType).
-		OrderDesc(dao.InventoryOrder.Columns().CreateTime).
+		Where(dao.ReturnOrder.Columns().OrderStatus, in.OrderStatus).
+		Where(dao.ReturnOrder.Columns().OrderType, in.OrderType).
+		OrderDesc(dao.ReturnOrder.Columns().CreateTime).
 		Page(in.Page, in.PageSize).
 		Scan(&orderList)
 	if err != nil {
@@ -312,10 +268,11 @@ func (s *sInventoryOrder) GetOrderList(ctx context.Context, in model.GetOrderLis
 	if err != nil {
 		return
 	}
-	out.Total, err = dao.InventoryOrder.Ctx(ctx).
+	out.Total, err = dao.ReturnOrder.Ctx(ctx).
 		OmitEmpty().
-		Where(dao.InventoryOrder.Columns().OrderStatus, in.OrderStatus).
-		Count(dao.InventoryOrder.Columns().OrderType, in.OrderType)
+		Where(dao.ReturnOrder.Columns().OrderStatus, in.OrderStatus).
+		Where(dao.ReturnOrder.Columns().OrderType, in.OrderType).
+		Count()
 	if err != nil {
 		return
 	}
@@ -326,7 +283,7 @@ func (s *sInventoryOrder) GetOrderList(ctx context.Context, in model.GetOrderLis
 	return
 }
 
-func (s *sInventoryOrder) CreateOrder(ctx context.Context, in model.CreateOrderInput) (out model.CreateOrderOutput, err error) {
+func (s *sReturnOrder) CreateOrder(ctx context.Context, in model.CreateOrderInput) (out model.CreateOrderOutput, err error) {
 	currentTime := gtime.Now()
 	// 获取源单据信息
 	if in.POrderNo == nil {
@@ -340,17 +297,17 @@ func (s *sInventoryOrder) CreateOrder(ctx context.Context, in model.CreateOrderI
 	}
 	out.POrder = gconv.MapDeep(pOrderInfo)
 
-	// 若源订单未完成，则不允许创建出/入库单
+	// 若源订单未完成，则不允许创建退货单
 	if pOrderInfo.Order["orderStatus"] != consts.OrderStatusDone {
-		return model.CreateOrderOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "源订单未完成，不允许创建出/入库单")
+		return model.CreateOrderOutput{}, gerror.NewCode(gcode.CodeInvalidParameter, "源订单未完成，不允许创建退货单")
 	}
 
-	// 初始化出/入库单信息
+	// 初始化退货单信息
 	userInfo, err := service.User().GetUserById(ctx, model.GetUserByIdInput{UserId: redis.Ctx(ctx).CheckLogin()})
 	if err != nil {
 		return model.CreateOrderOutput{}, err
 	}
-	order := entity.InventoryOrder{
+	order := entity.ReturnOrder{
 		OrderNo:        service.Order().GenerateOrderNo(*in.OrderType, currentTime),
 		OrderType:      *in.OrderType,
 		POrderNo:       *in.POrderNo,
@@ -362,7 +319,7 @@ func (s *sInventoryOrder) CreateOrder(ctx context.Context, in model.CreateOrderI
 		OrderStatus:    consts.OrderStatusInit,
 		Notes:          in.Notes,
 	}
-	order.OrderId, err = dao.InventoryOrder.Ctx(ctx).InsertAndGetId(order)
+	order.OrderId, err = dao.ReturnOrder.Ctx(ctx).InsertAndGetId(order)
 	if err != nil {
 		return
 	}
@@ -370,16 +327,16 @@ func (s *sInventoryOrder) CreateOrder(ctx context.Context, in model.CreateOrderI
 	return
 }
 
-func (s *sInventoryOrder) CancelCreateOrder(ctx context.Context, in model.CancelCreateOrderInput) (err error) {
+func (s *sReturnOrder) CancelCreateOrder(ctx context.Context, in model.CancelCreateOrderInput) (err error) {
 	// 获取订单信息
-	orderResult, err := dao.InventoryOrder.Ctx(ctx).OmitNil().One(in)
+	orderResult, err := dao.ReturnOrder.Ctx(ctx).One(in)
 	if err != nil {
 		return err
 	}
 	if orderResult.IsEmpty() {
 		return gerror.NewCode(gcode.CodeNotFound, "订单不存在")
 	}
-	var order entity.InventoryOrder
+	var order entity.ReturnOrder
 	err = orderResult.Struct(&order)
 	if err != nil {
 		return err
@@ -389,7 +346,7 @@ func (s *sInventoryOrder) CancelCreateOrder(ctx context.Context, in model.Cancel
 		return gerror.NewCode(gcode.CodeInvalidParameter, "订单状态错误，无法取消")
 	}
 	// 删除订单及订单项
-	_, err = dao.InventoryOrder.Ctx(ctx).Delete(dao.InventoryOrder.Columns().OrderId, order.OrderId)
+	_, err = dao.ReturnOrder.Ctx(ctx).Delete(dao.ReturnOrder.Columns().OrderId, order.OrderId)
 	if err != nil {
 		return err
 	}
@@ -397,13 +354,13 @@ func (s *sInventoryOrder) CancelCreateOrder(ctx context.Context, in model.Cancel
 	return
 }
 
-func (s *sInventoryOrder) CancelOrder(ctx context.Context, in model.CancelOrderInput) (err error) {
+func (s *sReturnOrder) CancelOrder(ctx context.Context, in model.CancelOrderInput) (err error) {
 	// 获取订单信息
 	orderInfoOutput, err := s.GetOrderInfo(ctx, model.GetOrderInfoInput{OrderNo: &in.OrderNo})
 	if err != nil {
 		return err
 	}
-	var order entity.InventoryOrder
+	var order entity.ReturnOrder
 	var items = orderInfoOutput.Items
 	err = gconv.Struct(orderInfoOutput.Order, &order)
 	if err != nil {
@@ -420,11 +377,11 @@ func (s *sInventoryOrder) CancelOrder(ctx context.Context, in model.CancelOrderI
 		}
 	}
 	// 更新订单状态
-	_, err = dao.InventoryOrder.Ctx(ctx).
-		Where(dao.InventoryOrder.Columns().OrderNo, in.OrderNo).
+	_, err = dao.ReturnOrder.Ctx(ctx).
+		Where(dao.ReturnOrder.Columns().OrderNo, in.OrderNo).
 		Data(g.Map{
-			dao.InventoryOrder.Columns().OrderStatus: consts.OrderStatusCancel,
-			dao.InventoryOrder.Columns().Notes:       in.Notes,
+			dao.ReturnOrder.Columns().OrderStatus: consts.OrderStatusCancel,
+			dao.ReturnOrder.Columns().Notes:       in.Notes,
 		}).
 		Update()
 	if err != nil {

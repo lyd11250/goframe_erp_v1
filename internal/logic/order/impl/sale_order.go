@@ -198,12 +198,43 @@ func (s *sSaleOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInfoInpu
 	err = dao.OrderItem.Ctx(ctx).
 		Where(dao.OrderItem.Columns().OrderNo, order.OrderNo).
 		Scan(&out.Items)
+	if err != nil {
+		return model.GetOrderInfoOutput{}, err
+	}
+	// 获取其他信息
+	out.Info = make(map[string]interface{})
+	// 已完成的销售订单的已出库数量
+	if order.OrderStatus == consts.OrderStatusDone {
+
+		relDoneInventoryOrderNoArrayResult, err := dao.InventoryOrder.Ctx(ctx).
+			Where(dao.InventoryOrder.Columns().POrderNo, order.OrderNo).
+			Where(dao.InventoryOrder.Columns().OrderStatus, consts.OrderStatusDone).
+			Fields(dao.InventoryOrder.Columns().OrderNo).
+			All()
+		if err != nil {
+			return model.GetOrderInfoOutput{}, err
+		}
+		relDoneInventoryOrderNoArray := relDoneInventoryOrderNoArrayResult.Array()
+		sumMap, err := dao.OrderItem.Ctx(ctx).
+			WhereIn(dao.OrderItem.Columns().OrderNo, relDoneInventoryOrderNoArray).
+			Where(dao.OrderItem.Columns().Status, consts.OrderStatusDone).
+			Fields(dao.OrderItem.Columns().GoodsId, dao.OrderItem.Columns().GoodsName).
+			Group(dao.OrderItem.Columns().GoodsId, dao.OrderItem.Columns().GoodsName).
+			FieldSum(dao.OrderItem.Columns().Quantity, "sum").
+			All()
+		if err != nil {
+			return model.GetOrderInfoOutput{}, err
+		}
+		out.Info["inventoryDone"] = sumMap
+	}
 	return
 }
 
 func (s *sSaleOrder) GetOrderList(ctx context.Context, in model.GetOrderListInput) (out model.GetOrderListOutput, err error) {
 	var orderList []entity.SaleOrder
 	err = dao.SaleOrder.Ctx(ctx).
+		OmitEmpty().
+		Where(dao.SaleOrder.Columns().OrderStatus, in.OrderStatus).
 		OrderDesc(dao.SaleOrder.Columns().CreateTime).
 		Page(in.Page, in.PageSize).
 		Scan(&orderList)
@@ -214,7 +245,10 @@ func (s *sSaleOrder) GetOrderList(ctx context.Context, in model.GetOrderListInpu
 	if err != nil {
 		return
 	}
-	out.Total, err = dao.SaleOrder.Ctx(ctx).Count()
+	out.Total, err = dao.SaleOrder.Ctx(ctx).
+		OmitEmpty().
+		Where(dao.SaleOrder.Columns().OrderStatus, in.OrderStatus).
+		Count()
 	if err != nil {
 		return
 	}

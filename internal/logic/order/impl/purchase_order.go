@@ -207,12 +207,65 @@ func (s *sPurchaseOrder) GetOrderInfo(ctx context.Context, in model.GetOrderInfo
 	err = dao.OrderItem.Ctx(ctx).
 		Where(dao.OrderItem.Columns().OrderNo, order.OrderNo).
 		Scan(&out.Items)
+	if err != nil {
+		return model.GetOrderInfoOutput{}, err
+	}
+
+	// 获取其他信息
+	out.Info = make(map[string]interface{})
+	if order.OrderStatus == consts.OrderStatusDone {
+		// 已完成的采购订单的已入库数量
+		relDoneInventoryOrderNoArrayResult, err := dao.InventoryOrder.Ctx(ctx).
+			Where(dao.InventoryOrder.Columns().POrderNo, order.OrderNo).
+			Where(dao.InventoryOrder.Columns().OrderStatus, consts.OrderStatusDone).
+			Fields(dao.InventoryOrder.Columns().OrderNo).
+			All()
+		if err != nil {
+			return model.GetOrderInfoOutput{}, err
+		}
+		relDoneInventoryOrderNoArray := relDoneInventoryOrderNoArrayResult.Array()
+		sumMap, err := dao.OrderItem.Ctx(ctx).
+			WhereIn(dao.OrderItem.Columns().OrderNo, relDoneInventoryOrderNoArray).
+			Where(dao.OrderItem.Columns().Status, consts.OrderStatusDone).
+			Fields(dao.OrderItem.Columns().GoodsId, dao.OrderItem.Columns().GoodsName).
+			Group(dao.OrderItem.Columns().GoodsId, dao.OrderItem.Columns().GoodsName).
+			FieldSum(dao.OrderItem.Columns().Quantity, "sum").
+			All()
+		if err != nil {
+			return model.GetOrderInfoOutput{}, err
+		}
+		out.Info["inventoryDone"] = sumMap
+		// 已完成的采购订单的已退货数量
+		relDoneReturnOrderNoArrayResult, err := dao.ReturnOrder.Ctx(ctx).
+			Where(dao.ReturnOrder.Columns().POrderNo, order.OrderNo).
+			Where(dao.ReturnOrder.Columns().OrderStatus, consts.OrderStatusDone).
+			Fields(dao.ReturnOrder.Columns().OrderNo).
+			All()
+		if err != nil {
+			return model.GetOrderInfoOutput{}, err
+		}
+		relDoneReturnOrderNoArray := relDoneReturnOrderNoArrayResult.Array()
+		sumMap, err = dao.OrderItem.Ctx(ctx).
+			WhereIn(dao.OrderItem.Columns().OrderNo, relDoneReturnOrderNoArray).
+			Where(dao.OrderItem.Columns().Status, consts.OrderStatusDone).
+			Fields(dao.OrderItem.Columns().GoodsId, dao.OrderItem.Columns().GoodsName).
+			Group(dao.OrderItem.Columns().GoodsId, dao.OrderItem.Columns().GoodsName).
+			FieldSum(dao.OrderItem.Columns().Quantity, "sum").
+			All()
+		if err != nil {
+			return model.GetOrderInfoOutput{}, err
+		}
+		out.Info["returnDone"] = sumMap
+	}
+
 	return
 }
 
 func (s *sPurchaseOrder) GetOrderList(ctx context.Context, in model.GetOrderListInput) (out model.GetOrderListOutput, err error) {
 	var orderList []entity.PurchaseOrder
 	err = dao.PurchaseOrder.Ctx(ctx).
+		OmitEmpty().
+		Where(dao.PurchaseOrder.Columns().OrderStatus, in.OrderStatus).
 		OrderDesc(dao.PurchaseOrder.Columns().CreateTime).
 		Page(in.Page, in.PageSize).
 		Scan(&orderList)
@@ -223,7 +276,10 @@ func (s *sPurchaseOrder) GetOrderList(ctx context.Context, in model.GetOrderList
 	if err != nil {
 		return
 	}
-	out.Total, err = dao.PurchaseOrder.Ctx(ctx).Count()
+	out.Total, err = dao.PurchaseOrder.Ctx(ctx).
+		OmitEmpty().
+		Where(dao.PurchaseOrder.Columns().OrderStatus, in.OrderStatus).
+		Count()
 	if err != nil {
 		return
 	}

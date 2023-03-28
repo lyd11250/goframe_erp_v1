@@ -25,12 +25,14 @@ type GetOrderInfoInput struct {
 type GetOrderInfoOutput struct {
 	Order map[string]interface{}
 	Items []entity.OrderItem
+	Info  map[string]interface{}
 }
 
 type GetOrderListInput struct {
-	Page      int
-	PageSize  int
-	OrderType int
+	Page        int
+	PageSize    int
+	OrderType   int
+	OrderStatus *int
 }
 
 type GetOrderListOutput struct {

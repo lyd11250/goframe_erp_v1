@@ -19,6 +19,10 @@ func New() *sOrder {
 			consts.OrderTypeCGRK: impl.InventoryOrder,
 			consts.OrderTypeCGDD: impl.PurchaseOrder,
 			consts.OrderTypeXSDD: impl.SaleOrder,
+			consts.OrderTypeCGTH: impl.ReturnOrder,
+			consts.OrderTypeXSTH: impl.ReturnOrder,
+			consts.OrderTypeTHRK: impl.InventoryReturnOrder,
+			consts.OrderTypeTHCK: impl.InventoryReturnOrder,
 		},
 	}
 }

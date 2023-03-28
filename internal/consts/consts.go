@@ -22,6 +22,10 @@ const (
 	OrderTypeXSCK        // 销售出库单
 	OrderTypeCGDD        // 采购订单
 	OrderTypeCGRK        // 采购入库单
+	OrderTypeCGTH        // 采购退货单
+	OrderTypeXSTH        // 销售退货单
+	OrderTypeTHRK        // 退货入库单
+	OrderTypeTHCK        // 退货出库单
 )
 
 var OrderPrefixMap = map[int]string{
@@ -29,6 +33,10 @@ var OrderPrefixMap = map[int]string{
 	OrderTypeXSCK: "XSCK",
 	OrderTypeXSDD: "XSDD",
 	OrderTypeCGDD: "CGDD",
+	OrderTypeCGTH: "CGTH",
+	OrderTypeXSTH: "XSTH",
+	OrderTypeTHRK: "THRK",
+	OrderTypeTHCK: "THCK",
 }
 
 const (

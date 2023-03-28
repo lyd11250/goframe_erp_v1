@@ -15,13 +15,15 @@ type GetOrderInfoReq struct {
 type GetOrderInfoRes struct {
 	Order map[string]interface{} `json:"order"`
 	Items []entity.OrderItem     `json:"items"`
+	Info  map[string]interface{} `json:"info"`
 }
 
 type GetOrderListReq struct {
-	g.Meta    `method:"post" path:"/order/list" summary:"获取订单列表" tags:"订单管理"`
-	OrderType *int `json:"orderType" v:"required#订单类型不能为空"`
-	Page      *int `json:"page" v:"required#页码不能为空"`
-	PageSize  *int `json:"pageSize" v:"required#每页数量不能为空"`
+	g.Meta      `method:"post" path:"/order/list" summary:"获取订单列表" tags:"订单管理"`
+	OrderType   *int `json:"orderType" v:"required#订单类型不能为空"`
+	Page        *int `json:"page" v:"required#页码不能为空"`
+	PageSize    *int `json:"pageSize" v:"required#每页数量不能为空"`
+	OrderStatus *int `json:"orderStatus"`
 }
 
 type GetOrderListRes struct {
